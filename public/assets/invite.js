@@ -44,6 +44,14 @@
     }
     const col = /^#[0-9a-f]{6}$/i.test(e.color || '') ? e.color : (INV.envelopeColors.find(c => c.id === e.color) || INV.envelopeColors[1]).hex;
     const seal = INV.sealStyle(e);
+    // busta personalizzata fotografica: stesso stile delle buste pronte, colore e sigillo a scelta
+    const ce = INV.customEnvelopes[e.style === 'floreale' ? 'floreale' : 'ceralacca'];
+    if (ce) {
+      return `<div class="env-full env-custom" id="envelope" data-full="1" data-tipx="${ce.tipX}" data-tipy="${ce.tipY}" style="--env:${col}">
+        <video src="${ce.video}" poster="${ce.poster}" muted playsinline preload="auto"></video><div class="env-tint"></div>
+        <div class="seal ${seal.tint ? 'tint' : ''}" style="background-image:url('${seal.img}');--sealink:${seal.ink};--sealc:${seal.tint || 'transparent'};--sealimg:url('${seal.img}')"><span>${esc(e.initials)}</span></div>
+        <div class="env-full-hint"><span>${esc(T('tap'))}</span><i></i></div></div>`;
+    }
     const theme = INV.themes.find(t => t.id === S.theme) || INV.themes[0];
     const emboss = `url('${(INV.flowers.find(f => f.id === 'classico')).img}')`;
     return `<div class="env-hint">${esc(T('tap'))}</div>
@@ -358,10 +366,23 @@
     setTimeout(done, 1900);
   }
 
+  function placeSeal(env) {
+    const v = env.querySelector('video'), sl = env.querySelector('.seal');
+    if (!v || !sl) return;
+    const put = () => {
+      const vw = v.videoWidth || 720, vh = v.videoHeight || 1280, W = env.clientWidth, H = env.clientHeight;
+      const r = Math.max(W / vw, H / vh), ox = (W - vw * r) / 2, oy = (H - vh * r) / 2;
+      sl.style.left = (ox + vw * r * env.dataset.tipx / 100) + 'px';
+      sl.style.top = (oy + vh * r * env.dataset.tipy / 100) + 'px';
+      sl.style.width = Math.min(W, H * .5625) * .27 + 'px';
+    };
+    put(); v.addEventListener('loadedmetadata', put); addEventListener('resize', put);
+  }
   function showEnvelope() {
     const scr = $('#env-screen');
     scr.innerHTML = envelopeHTML();
     scr.classList.toggle('full', !!$('#envelope', scr).dataset.full);
+    if ($('#envelope', scr).classList.contains('env-custom')) placeSeal($('#envelope', scr));
     scr.classList.remove('gone');
     document.body.classList.add('locked');
     $('#envelope').addEventListener('click', () => {

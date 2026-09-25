@@ -230,3 +230,11 @@ body.locked { overflow: hidden; }
 [dir=rtl] .tl .t { text-align: left; }
 [dir=rtl] .rsvp .person { border-left: 0; border-right: 2px solid color-mix(in srgb, var(--accent) 45%, transparent); padding: 4px 14px 4px 0; }
 [dir=rtl] .langs { right: auto; left: 16px; }
+
+/* busta personalizzata fotografica: la carta bianca prende il colore scelto */
+.env-custom .env-tint { position: absolute; inset: 0; background: var(--env); mix-blend-mode: multiply; pointer-events: none; transition: opacity 1.2s ease 2.6s; }
+.env-custom .seal { position: absolute; transform: translate(-50%, -38%); top: 50%; left: 50%; width: 27%; z-index: 3; }
+.env-custom .seal span { font-size: clamp(18px, 6.2vw, 30px); }
+.env-custom.open .seal { transform: translate(-50%, -38%) scale(.55) rotate(-8deg); opacity: 0; transition: transform .6s ease, opacity .5s ease; }
+.env-custom.open .env-tint { opacity: 0; }
+.env-custom .env-full-hint { bottom: 5%; }

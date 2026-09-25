@@ -47,6 +47,13 @@ window.INV = {
     { id: 'amalfi', name: 'Limoni di Amalfi', desc: 'Acquerello di limoni e maioliche, sigillo bordeaux', poster: '/media/envelopes/amalfi.jpg', video: '/media/envelopes/amalfi.mp4' },
   ],
 
+  // busta personalizzata: foto reale di una busta bianca senza sigillo, colorata dal codice.
+  // tipX/tipY = punta del lembo nella foto originale (in %), dove va il sigillo
+  customEnvelopes: {
+    ceralacca: { poster: '/media/envelopes/custom/liscia.jpg', video: '/media/envelopes/custom/liscia.mp4', tipX: 51, tipY: 60 },
+    floreale: { poster: '/media/envelopes/custom/floreale.jpg', video: '/media/envelopes/custom/floreale.mp4', tipX: 51, tipY: 65.8 },
+  },
+
   seals: [
     { id: 'rosso', name: 'Rosso classico', img: '/media/seals/rosso.png', ink: '#3f070d' },
     { id: 'crema', name: 'Crema elegante', img: '/media/seals/crema.png', ink: '#7d6a48' },

@@ -153,8 +153,10 @@
         <span class="play">${I.play}</span>${t.popular ? '<span class="pop">Popolare</span>' : ''}${!custom && e.template === t.id ? `<span class="chk">${I.check}</span>` : ''}</div>
         <div class="meta"><b>${esc(t.name)}</b><small>${esc(t.desc)}</small></div></button>`).join('')
       + `<button type="button" class="theme ${custom ? 'on' : ''}" data-action="env-custom">
-        <div class="vid env-mini" style="--env:${col}"><div class="em-flap"></div><div class="em-seal ${seal.tint ? 'tint' : ''}" style="background-image:url('${seal.img}');--sealc:${seal.tint || 'transparent'};--sealimg:url('${seal.img}')"><span style="color:${seal.ink}">${esc(e.initials)}</span></div>
-        ${custom ? `<span class="chk">${I.check}</span>` : ''}</div>
+        ${(() => { const ce = INV.customEnvelopes[e.style === 'floreale' ? 'floreale' : 'ceralacca'];
+          return `<div class="vid env-photo" style="--env:${col};background-image:url('${ce.poster}')"><div class="env-tint"></div>
+          <div class="em-seal ${seal.tint ? 'tint' : ''}" style="left:${ce.tipX}%;top:${ce.tipY}%;background-image:url('${seal.img}');--sealc:${seal.tint || 'transparent'};--sealimg:url('${seal.img}')"><span style="color:${seal.ink}">${esc(e.initials)}</span></div>
+          ${custom ? `<span class="chk">${I.check}</span>` : ''}</div>`; })()}
         <div class="meta"><b>Busta personalizzata</b><small>Le vostre iniziali sul sigillo, colori a scelta</small></div></button>`;
     const customHTML = custom ? `
       <div class="sec"><h3>1. Inserisci le iniziali</h3>${inp('envelope.initials', 'es. G & M')}<p class="hint">Le iniziali compariranno sul sigillo della busta</p></div>
