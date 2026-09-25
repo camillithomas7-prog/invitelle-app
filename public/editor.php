@@ -2,7 +2,10 @@
 // Pannello di creazione dell'invito: /editor?id=N
 require_once __DIR__ . '/../lib/auth.php';
 // admin: qualsiasi invito (?id=). Cliente: solo il suo, qualunque id arrivi
-$isAdmin = is_admin();
+// vista cliente aperta dall'admin: stesso pannello del cliente, con la barra per tornare all'admin
+boot_session();
+$asClient = !empty($_SESSION['as_client']) && is_admin() && current_code();
+$isAdmin = is_admin() && !$asClient;
 $code = $isAdmin ? null : current_code();
 if (!$isAdmin && !$code) { header('Location: /'); exit; }
 $inv = invite_by_id($isAdmin ? (int) ($_GET['id'] ?? 0) : (int) $code['invite_id']);
@@ -21,6 +24,7 @@ $name = trim(preg_replace('/\s+/', ' ', $inv['data']['details']['headline'] ?? '
 <link rel="stylesheet" href="/assets/editor.css?v=<?= $v('editor.css') ?>">
 </head>
 <body>
+<?php if ($asClient): ?><div class="as-client">Stai vedendo il pannello come il cliente <b><?= h($code['label'] ?: $code['code']) ?></b> (codice <?= h($code['code']) ?>) · <a href="/admin?p=fine-cliente">Torna all'admin</a></div><?php endif; ?>
 <header class="top">
   <a class="brand" href="<?= $isAdmin ? '/admin' : '/editor' ?>"><img src="/media/logo-invitelle.png" alt=""><b>Invitelle</b></a>
   <span class="name"><?= h($name) ?></span>

@@ -2,7 +2,11 @@
 // Accesso del cliente con il solo codice ricevuto con l'ordine (niente registrazione, niente password)
 require_once __DIR__ . '/../lib/auth.php';
 boot_session();
-if (isset($_GET['esci'])) { unset($_SESSION['code_id']); header('Location: /'); exit; }
+if (isset($_GET['esci'])) {
+    $wasAdmin = !empty($_SESSION['as_client']);
+    unset($_SESSION['code_id'], $_SESSION['as_client']);
+    header('Location: ' . ($wasAdmin ? '/admin?p=codici' : '/')); exit;
+}
 if (current_code()) { header('Location: /editor'); exit; }
 
 $err = '';

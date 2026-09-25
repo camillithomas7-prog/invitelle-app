@@ -15,7 +15,8 @@ const DEFAULT_MSG = "Ciao {nome}!\nGrazie per il tuo ordine. Ecco il tuo codice 
 $site = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
 $p = $_GET['p'] ?? 'home';
 
-if ($p === 'logout') { unset($_SESSION['admin_id']); back('/admin'); }
+if ($p === 'logout') { unset($_SESSION['admin_id'], $_SESSION['as_client'], $_SESSION['code_id']); back('/admin'); }
+if ($p === 'fine-cliente') { unset($_SESSION['as_client'], $_SESSION['code_id']); back('/admin?p=codici'); }
 
 /* ───────── accesso / primo avvio ───────── */
 $admin = current_admin();
@@ -87,6 +88,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($c && !empty($_POST['with_invite']) && $c['invite_id']) db()->prepare('DELETE FROM invites WHERE id = ?')->execute([$c['invite_id']]);
         db()->prepare('DELETE FROM codes WHERE id = ?')->execute([(int) $_POST['id']]);
         flash(!empty($_POST['with_invite']) ? 'Codice e invito eliminati.' : 'Codice eliminato (l\'invito resta nell\'elenco inviti).');
+    } elseif ($a === 'as_client') {
+        // l'admin vede il pannello esattamente come il cliente (non conta come accesso del cliente)
+        $s = db()->prepare('SELECT * FROM codes WHERE id = ?'); $s->execute([(int) $_POST['id']]); $c = $s->fetch();
+        if ($c) {
+            if (!$c['invite_id'] || !invite_by_id((int) $c['invite_id'])) {
+                $iid = create_invite(false, $c['label'] ?: 'invito');
+                db()->prepare('UPDATE codes SET invite_id = ? WHERE id = ?')->execute([$iid, $c['id']]);
+            }
+            if ($c['status'] !== 'active') { flash('Il codice è revocato: riattivalo per vedere il pannello cliente.', 'err'); back('/admin?p=codici'); }
+            $_SESSION['code_id'] = (int) $c['id']; $_SESSION['as_client'] = true;
+            back('/editor');
+        }
     } elseif ($a === 'new_invite') {
         $id = create_invite(true); back('/editor?id=' . $id);
     } elseif ($a === 'del_invite') {
@@ -192,7 +205,8 @@ $tabs = ['home' => 'Panoramica', 'codici' => 'Codici clienti', 'inviti' => 'Invi
             <br><span class="hint" style="margin:4px 0 0;display:block"><?= $c['first_used_at'] ? 'Entrato ' . (int) $c['uses'] . ' volte · ultima ' . h(substr($c['last_used_at'], 0, 10)) : 'Mai entrato' ?></span></td>
           <td><?php if ($c['invite_id'] && $c['slug']): ?><a href="/i/<?= h($c['slug']) ?>" target="_blank">/i/<?= h($c['slug']) ?></a><br><span class="hint" style="margin:0"><?= (int) $c['ng'] ?> ospiti · <?= (int) $c['na'] ?> confermati</span><?php else: ?><span class="hint" style="margin:0">Si crea al primo accesso</span><?php endif; ?></td>
           <td><div class="acts">
-            <?php if ($c['invite_id']): ?><a class="btn sm" href="/editor?id=<?= (int) $c['invite_id'] ?>">Apri</a><?php endif; ?>
+            <form method="post"><input type="hidden" name="csrf" value="<?= csrf() ?>"><input type="hidden" name="action" value="as_client"><input type="hidden" name="id" value="<?= (int) $c['id'] ?>"><button class="btn sm pri" title="Apri il pannello come lo vede il cliente">Vedi come cliente</button></form>
+            <?php if ($c['invite_id']): ?><a class="btn sm" href="/editor?id=<?= (int) $c['invite_id'] ?>" title="Modifica l'invito come admin">Apri da admin</a><?php endif; ?>
             <button class="btn sm" type="button" onclick="navigator.clipboard.writeText(<?= h(json_encode($mail, JSON_UNESCAPED_UNICODE)) ?>);this.textContent='Copiato'">Copia messaggio</button>
             <?php if ($c['email']): ?><a class="btn sm" href="<?= h($gm) ?>" target="_blank" rel="noopener">Gmail</a><?php endif; ?>
             <a class="btn sm" href="/admin?p=codici&edit=<?= (int) $c['id'] ?>">Modifica</a>
