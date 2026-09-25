@@ -56,11 +56,18 @@
   function printCards() {
     const img = document.getElementById('al-card').toDataURL('image/png');
     const w = window.open('', '_blank');
+    // 4 cartoncini (2x2) su un solo A4, con linee di taglio
     w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>QR album da stampare</title><style>
-      @page { size: A4; margin: 8mm; } body { margin: 0; } .g { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
-      img { width: 100%; display: block; outline: 0.3mm dashed #bbb; outline-offset: 2mm; } p { font: 11px sans-serif; color: #888; text-align: center; margin: 4mm 0 0; }</style></head>
-      <body><div class="g">${'<img src="' + img + '">'.repeat(4)}</div><p>Ritaglia lungo le linee tratteggiate e metti un cartoncino su ogni tavolo</p>
-      <script>window.onload = () => setTimeout(() => print(), 300)<\/script></body></html>`);
+      @page { size: A4 portrait; margin: 8mm; }
+      html, body { margin: 0; }
+      .g { display: grid; grid-template-columns: repeat(2, 92mm); grid-auto-rows: 130mm; gap: 6mm; justify-content: center; }
+      .c { display: flex; align-items: center; justify-content: center; outline: 0.3mm dashed #bbb; outline-offset: 1.5mm; }
+      .c img { width: 100%; height: 100%; object-fit: contain; display: block; }
+      p { font: 9pt sans-serif; color: #888; text-align: center; margin: 3mm 0 0; }
+      @media screen { body { background: #eee; padding: 20px; } .g { background: #fff; padding: 8mm; width: max-content; margin: 0 auto; } }
+    </style></head><body><div class="g">${Array(4).fill('<div class="c"><img src="' + img + '"></div>').join('')}</div>
+      <p>Ritaglia lungo le linee tratteggiate e metti un cartoncino su ogni tavolo</p>
+      <script>window.onload = () => setTimeout(() => print(), 400)<\/script></body></html>`);
     w.document.close();
   }
 
