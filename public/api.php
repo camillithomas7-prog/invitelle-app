@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../lib/auth.php';
 
 $a = $_GET['a'] ?? '';
+$in = json_decode(file_get_contents('php://input') ?: '{}', true) ?: [];
 // azioni aperte agli ospiti (invito, RSVP, album); tutto il resto richiede l'accesso (admin o codice cliente)
 $public = ['rsvp.submit', 'guest.byToken', 'album.upload', 'album.guestDelete'];
 if (!in_array($a, $public, true)) {
@@ -14,7 +15,6 @@ if (!in_array($a, $public, true)) {
         if (!can_access_invite($iid)) json_out(['error' => 'Non hai accesso a questo invito'], 403);
     }
 }
-$in = json_decode(file_get_contents('php://input') ?: '{}', true) ?: [];
 
 function guest_row(array $g): array {
     $g['answers'] = json_decode($g['answers'] ?: '{}', true) ?: new stdClass();
