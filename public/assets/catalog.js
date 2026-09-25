@@ -50,8 +50,15 @@ window.INV = {
   // busta personalizzata: foto reale di una busta bianca senza sigillo, colorata dal codice.
   // tipX/tipY = punta del lembo nella foto originale (in %), dove va il sigillo
   customEnvelopes: {
-    ceralacca: { poster: '/media/envelopes/custom/liscia.jpg', video: '/media/envelopes/custom/liscia.mp4', tipX: 51, tipY: 60 },
-    floreale: { poster: '/media/envelopes/custom/floreale.jpg', video: '/media/envelopes/custom/floreale.mp4', tipX: 51, tipY: 65.8 },
+    ceralacca: { name: 'Carta liscia', poster: '/media/envelopes/custom/liscia.jpg', video: '/media/envelopes/custom/liscia.mp4', tipX: 51, tipY: 60 },
+    floreale: { name: 'Rilievo di rose', poster: '/media/envelopes/custom/floreale.jpg', video: '/media/envelopes/custom/floreale.mp4', tipX: 51, tipY: 65.8 },
+    lino: { name: 'Tela di lino', poster: '/media/envelopes/custom/lino.jpg', video: '/media/envelopes/custom/lino.mp4', tipX: 50, tipY: 58.2 },
+    sfrangiato: { name: 'Bordo sfrangiato', poster: '/media/envelopes/custom/sfrangiato.jpg', video: '/media/envelopes/custom/sfrangiato.mp4', tipX: 50, tipY: 69.5 },
+    artdeco: { name: 'Art Déco', poster: '/media/envelopes/custom/artdeco.jpg', video: '/media/envelopes/custom/artdeco.mp4', tipX: 50, tipY: 64.6 },
+    pizzo: { name: 'Pizzo', poster: '/media/envelopes/custom/pizzo.jpg', video: '/media/envelopes/custom/pizzo.mp4', tipX: 50, tipY: 62.6 },
+    ulivo: { name: 'Rami d\'ulivo', poster: '/media/envelopes/custom/ulivo.jpg', video: '/media/envelopes/custom/ulivo.mp4', tipX: 50, tipY: 66.6 },
+    perlata: { name: 'Carta perlata', poster: '/media/envelopes/custom/perlata.jpg', video: '/media/envelopes/custom/perlata.mp4', tipX: 50, tipY: 68.8 },
+    'fiori-secchi': { name: 'Fiori pressati', poster: '/media/envelopes/custom/fiori-secchi.jpg', video: '/media/envelopes/custom/fiori-secchi.mp4', tipX: 50, tipY: 69.5 },
   },
 
   seals: [
@@ -236,6 +243,8 @@ INV.loadLang = async (code) => {
   } catch (e) {}
 };
 INV.loadLangs = (codes) => Promise.all([...new Set(codes)].map(INV.loadLang));
+
+INV.customEnv = (style) => INV.customEnvelopes[style] || INV.customEnvelopes.ceralacca;
 
 INV.fontUrl = (fams) => 'https://fonts.googleapis.com/css2?' + [...new Set(fams)].filter(Boolean)
   .map(f => 'family=' + f.replace(/ /g, '+')).join('&') + '&display=swap';

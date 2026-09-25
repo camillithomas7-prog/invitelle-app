@@ -45,7 +45,7 @@
     const col = /^#[0-9a-f]{6}$/i.test(e.color || '') ? e.color : (INV.envelopeColors.find(c => c.id === e.color) || INV.envelopeColors[1]).hex;
     const seal = INV.sealStyle(e);
     // busta personalizzata fotografica: stesso stile delle buste pronte, colore e sigillo a scelta
-    const ce = INV.customEnvelopes[e.style === 'floreale' ? 'floreale' : 'ceralacca'];
+    const ce = INV.customEnv(e.style);
     if (ce) {
       return `<div class="env-full env-custom" id="envelope" data-full="1" data-tipx="${ce.tipX}" data-tipy="${ce.tipY}" style="--env:${col}">
         <video src="${ce.video}" poster="${ce.poster}" muted playsinline preload="auto"></video><div class="env-tint"></div>

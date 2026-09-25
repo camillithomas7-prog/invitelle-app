@@ -462,3 +462,9 @@ body.wide .pl-table, body.wide .ck-g, body.wide .pl-prog { max-width: 1100px; }
 .env-photo .env-tint { position: absolute; inset: 0; background: var(--env); mix-blend-mode: multiply; }
 .env-photo .em-seal { width: 34%; transform: translate(-50%, -38%); }
 .env-photo .em-seal span { font-size: 15px; }
+
+.env-styles { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+.env-st { border: 1px solid var(--line); border-radius: 10px; background: #fff; padding: 6px; text-align: center; }
+.env-st .env-photo { position: relative; aspect-ratio: 1; border-radius: 7px; overflow: hidden; background-size: 260% !important; background-position: var(--pos) !important; }
+.env-st span { display: block; font-size: 12px; margin-top: 6px; }
+.env-st.on { border-color: var(--brand); background: var(--brand-soft); box-shadow: 0 0 0 1px var(--brand); }
