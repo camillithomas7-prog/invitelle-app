@@ -450,3 +450,10 @@ body.wide .pl-table, body.wide .ck-g, body.wide .pl-prog { max-width: 1100px; }
 /* admin che guarda il pannello come il cliente */
 .as-client { background: #2b2522; color: #fff; text-align: center; font-size: 13px; padding: 9px 14px; }
 .as-client a { color: #f3d9a4; font-weight: 600; margin-left: 6px; }
+
+/* stili del cartoncino QR */
+.al-styles { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; margin-bottom: 6px; }
+.al-st { border: 1px solid var(--line); border-radius: 10px; background: #fff; padding: 6px 6px 7px; text-align: center; }
+.al-st canvas { width: 100%; height: auto; display: block; border-radius: 5px; background: #f3eee7; box-shadow: 0 2px 6px rgba(0,0,0,.08); }
+.al-st span { display: block; font-size: 11px; margin-top: 5px; color: #4a413c; line-height: 1.25; }
+.al-st.on { border-color: var(--brand); background: var(--brand-soft); box-shadow: 0 0 0 1px var(--brand); }

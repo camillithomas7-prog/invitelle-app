@@ -41,7 +41,7 @@
   };
 
   let S = window.__INVITE.data;
-  S.album = Object.assign({ enabled: true, askName: true, cardTitle: 'Condividi i tuoi scatti', cardText: 'Inquadra il codice e carica le foto e i video della festa' }, S.album || {});
+  S.album = Object.assign({ cardStyle: 'avorio', enabled: true, askName: true, cardTitle: 'Condividi i tuoi scatti', cardText: 'Inquadra il codice e carica le foto e i video della festa' }, S.album || {});
   // aggiorna i blocchi "La nostra storia" creati con la versione precedente
   (S.blocks || []).filter(b => b.type === 'story').forEach(b => {
     const def = INV.blockTypes.story.def(), d = b.data;
@@ -735,7 +735,7 @@
   // salva prima di uscire
   window.addEventListener('beforeunload', () => { if (saveT) navigator.sendBeacon?.('/api?a=invite.save', JSON.stringify({ id: ID, data: S })); });
 
-  AlbumPanel.init({ api, toast, inviteId: ID, icons: I, S: () => S, rerender: () => render(), field });
+  AlbumPanel.init({ api, toast, inviteId: ID, icons: I, S: () => S, rerender: () => render(), field, save: () => changed() });
   Planner.init({
     api, toast, render: () => render(), inviteId: ID, icons: I,
     guests: () => guestsData?.guests || [],
