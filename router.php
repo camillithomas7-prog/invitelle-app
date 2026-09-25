@@ -16,7 +16,8 @@ if (preg_match('#^/album/([a-z0-9-]+)/?$#', $path, $m)) {
     return true;
 }
 if ($path === '/' || $path === '/index.php') { require __DIR__ . '/public/index.php'; return true; }
-if ($path === '/login') { require __DIR__ . '/public/login.php'; return true; }
+if ($path === '/admin' || $path === '/admin/') { require __DIR__ . '/public/admin.php'; return true; }
+if ($path === '/login') { header('Location: /admin'); return true; }
 if ($path === '/editor') { require __DIR__ . '/public/editor.php'; return true; }
 if ($path === '/api') { require __DIR__ . '/public/api.php'; return true; }
 

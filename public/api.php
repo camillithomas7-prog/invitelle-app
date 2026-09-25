@@ -3,9 +3,17 @@
 require_once __DIR__ . '/../lib/auth.php';
 
 $a = $_GET['a'] ?? '';
-// azioni aperte agli ospiti (invito, RSVP, album); tutto il resto richiede il login al pannello
+// azioni aperte agli ospiti (invito, RSVP, album); tutto il resto richiede l'accesso (admin o codice cliente)
 $public = ['rsvp.submit', 'guest.byToken', 'album.upload', 'album.guestDelete'];
-if (!in_array($a, $public, true) && !is_admin()) json_out(['error' => 'Accesso richiesto: effettua di nuovo il login'], 401);
+if (!in_array($a, $public, true)) {
+    if (!is_admin() && !current_code()) json_out(['error' => 'Accesso richiesto: rientra con il tuo codice'], 401);
+    if (in_array($a, ['invite.create', 'invite.delete'], true) && !is_admin()) json_out(['error' => 'Solo l\'admin può farlo'], 403);
+    // ogni azione su un invito: il cliente può toccare solo il suo
+    if ($a !== 'upload') {
+        $iid = (int) ($in['invite_id'] ?? $in['id'] ?? $_GET['invite_id'] ?? 0);
+        if (!can_access_invite($iid)) json_out(['error' => 'Non hai accesso a questo invito'], 403);
+    }
+}
 $in = json_decode(file_get_contents('php://input') ?: '{}', true) ?: [];
 
 function guest_row(array $g): array {
@@ -33,7 +41,7 @@ function norm_phone(string $p): string {
 
 switch ($a) {
     case 'invite.create':
-        json_out(['id' => create_invite()]);
+        json_out(['id' => create_invite(true)]);
 
     case 'invite.save':
         $id = (int) ($in['id'] ?? 0);

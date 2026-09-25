@@ -1,6 +1,6 @@
 # Invitelle — pannello creazione inviti
 
-Avvio locale: `./start.sh` (porta 8486). Online su Hostinger: le rotte sono in `.htaccess`, dati in `data/` e caricamenti in `public/uploads/` (non nel repo). Al primo accesso `/login` chiede di creare la password del pannello.
+Avvio locale: `./start.sh` (porta 8486). Online su Hostinger: le rotte sono in `.htaccess`, dati in `data/` e caricamenti in `public/uploads/` (non nel repo). Accessi come il pannello corsi 3D WEB LAB: `/admin` = admin (email+password creati al primo accesso), genera i codici `INV-XXXX-XXXX` per ogni cliente; il cliente entra su `/` con il solo codice e vede solo il suo invito.
 
 - `/` I miei inviti · `/editor?id=N` pannello · `/i/{slug}` invito pubblico (`?g=token` link personale ospite)
 - `lib/db.php` SQLite (`data/invitelle.sqlite`) + invito di default

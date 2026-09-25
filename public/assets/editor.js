@@ -79,7 +79,7 @@
     const opt = body instanceof FormData ? { method: 'POST', body } : body ? { method: 'POST', body: JSON.stringify(body) } : {};
     try {
       const r = await fetch(`/api?a=${a}${qs}`, opt);
-      if (r.status === 401) { location.href = '/login?next=' + encodeURIComponent(location.pathname + location.search); return { error: 'Accesso richiesto' }; }
+      if (r.status === 401) { location.href = '/'; return { error: 'Accesso richiesto' }; }
       return await r.json();
     } catch (e) { return { error: 'Errore di rete' }; }
   }

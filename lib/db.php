@@ -45,6 +45,26 @@ function db(): PDO {
             uploader TEXT DEFAULT '',
             created_at TEXT DEFAULT (datetime('now','localtime'))
         );
+        CREATE TABLE IF NOT EXISTS admins (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT UNIQUE NOT NULL,
+            pass_hash TEXT NOT NULL,
+            created_at TEXT DEFAULT (datetime('now','localtime'))
+        );
+        CREATE TABLE IF NOT EXISTS codes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            code TEXT UNIQUE NOT NULL,
+            label TEXT DEFAULT '',
+            order_ref TEXT DEFAULT '',
+            email TEXT DEFAULT '',
+            status TEXT DEFAULT 'active',
+            expires_at TEXT,
+            invite_id INTEGER REFERENCES invites(id) ON DELETE SET NULL,
+            uses INTEGER DEFAULT 0,
+            first_used_at TEXT,
+            last_used_at TEXT,
+            created_at TEXT DEFAULT (datetime('now','localtime'))
+        );
         CREATE TABLE IF NOT EXISTS planning (
             invite_id INTEGER PRIMARY KEY REFERENCES invites(id) ON DELETE CASCADE,
             data TEXT NOT NULL,
@@ -196,18 +216,21 @@ function invite_by_slug(string $slug): ?array {
     return $r;
 }
 
-function create_invite(): int {
+function create_invite(bool $samples = false, string $label = ''): int {
     $data = default_invite();
-    $slug = 'giulia-e-marco';
+    $base = $label !== '' ? slugify($label) : 'giulia-e-marco';
+    $slug = $base;
     $n = 1;
-    while (invite_by_slug($slug)) $slug = 'giulia-e-marco-' . (++$n);
+    while (invite_by_slug($slug)) $slug = $base . '-' . (++$n);
     db()->prepare('INSERT INTO invites (slug, data) VALUES (?, ?)')->execute([$slug, json_encode($data, JSON_UNESCAPED_UNICODE)]);
     $id = (int) db()->lastInsertId();
-    // ospiti di esempio
-    $g = db()->prepare('INSERT INTO guests (invite_id, name, email, phone_cc, phone, total_guests, status, token, answers, responded_at) VALUES (?,?,?,?,?,?,?,?,?,?)');
-    $g->execute([$id, 'Luca e Sara Ferri', 'luca.ferri@example.com', '+39', '3331234567', 2, 'attending', uid(12), json_encode(['party' => [['name' => 'Luca', 'diets' => []], ['name' => 'Sara', 'diets' => ['vegetariano']]], 'message' => 'Non vediamo l\'ora!', 'song' => 'Perfect - Ed Sheeran']), date('Y-m-d H:i:s')]);
-    $g->execute([$id, 'Nonna Anna', '', '+39', '3339876543', 1, 'pending', uid(12), '{}', null]);
-    $g->execute([$id, 'Paolo Conti', 'paolo@example.com', '+39', '', 1, 'pending', uid(12), '{}', null]);
+    if ($samples) {
+        // ospiti di esempio (solo per gli inviti di prova dell'admin)
+        $g = db()->prepare('INSERT INTO guests (invite_id, name, email, phone_cc, phone, total_guests, status, token, answers, responded_at) VALUES (?,?,?,?,?,?,?,?,?,?)');
+        $g->execute([$id, 'Luca e Sara Ferri', 'luca.ferri@example.com', '+39', '3331234567', 2, 'attending', uid(12), json_encode(['party' => [['name' => 'Luca', 'diets' => []], ['name' => 'Sara', 'diets' => ['vegetariano']]], 'message' => 'Non vediamo l\'ora!', 'song' => 'Perfect - Ed Sheeran']), date('Y-m-d H:i:s')]);
+        $g->execute([$id, 'Nonna Anna', '', '+39', '3339876543', 1, 'pending', uid(12), '{}', null]);
+        $g->execute([$id, 'Paolo Conti', 'paolo@example.com', '+39', '', 1, 'pending', uid(12), '{}', null]);
+    }
     return $id;
 }
 

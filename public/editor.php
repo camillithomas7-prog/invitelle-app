@@ -1,9 +1,12 @@
 <?php
 // Pannello di creazione dell'invito: /editor?id=N
 require_once __DIR__ . '/../lib/auth.php';
-require_admin_page();
-$inv = invite_by_id((int) ($_GET['id'] ?? 0));
-if (!$inv) { header('Location: /'); exit; }
+// admin: qualsiasi invito (?id=). Cliente: solo il suo, qualunque id arrivi
+$isAdmin = is_admin();
+$code = $isAdmin ? null : current_code();
+if (!$isAdmin && !$code) { header('Location: /'); exit; }
+$inv = invite_by_id($isAdmin ? (int) ($_GET['id'] ?? 0) : (int) $code['invite_id']);
+if (!$inv) { header('Location: ' . ($isAdmin ? '/admin?p=inviti' : '/')); exit; }
 $v = fn($f) => filemtime(__DIR__ . "/assets/$f");
 $name = trim(preg_replace('/\s+/', ' ', $inv['data']['details']['headline'] ?? ''));
 ?><!doctype html>
@@ -19,12 +22,12 @@ $name = trim(preg_replace('/\s+/', ' ', $inv['data']['details']['headline'] ?? '
 </head>
 <body>
 <header class="top">
-  <a class="brand" href="/"><img src="/media/logo-invitelle.png" alt=""><b>Invitelle</b></a>
+  <a class="brand" href="<?= $isAdmin ? '/admin' : '/editor' ?>"><img src="/media/logo-invitelle.png" alt=""><b>Invitelle</b></a>
   <span class="name"><?= h($name) ?></span>
   <span class="sp"></span>
   <span class="save-state" id="save-state"><i></i><span>Salvato</span></span>
-  <a class="btn" href="/login?logout=1" title="Esci"><span class="lbl">Esci</span></a>
-  <a class="btn" href="/"><span class="lbl">I miei inviti</span><span class="ico-only" hidden>←</span></a>
+  <?php if ($isAdmin): ?><a class="btn" href="/admin?p=inviti"><span class="lbl">Pannello admin</span></a>
+  <?php else: ?><a class="btn" href="/?esci=1"><span class="lbl">Esci</span></a><?php endif; ?>
   <a class="btn pri" href="/i/<?= h($inv['slug']) ?>" target="_blank" rel="noopener" id="open-inv">Apri invito</a>
 </header>
 
