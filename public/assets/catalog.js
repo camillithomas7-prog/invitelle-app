@@ -71,6 +71,16 @@ window.INV = {
     { id: 'none', name: 'Nessuno' },
     { id: 'classico', name: 'Classico', img: '/media/flowers/classico.jpg' },
     { id: 'gigli-rose', name: 'Gigli e rose', img: '/media/flowers/gigli-rose.jpg' },
+    { id: 'eucalipto', name: 'Eucalipto', img: '/media/flowers/eucalipto.jpg' },
+    { id: 'peonie', name: 'Peonie', img: '/media/flowers/peonie.jpg' },
+    { id: 'ranuncoli', name: 'Ranuncoli pesca', img: '/media/flowers/ranuncoli.jpg' },
+    { id: 'glicine', name: 'Glicine', img: '/media/flowers/glicine.jpg' },
+    { id: 'limoni', name: 'Limoni di Amalfi', img: '/media/flowers/limoni.jpg' },
+    { id: 'ulivo', name: 'Rami d\'ulivo', img: '/media/flowers/ulivo.jpg' },
+    { id: 'boho', name: 'Boho pampas', img: '/media/flowers/boho.jpg' },
+    { id: 'campo', name: 'Fiori di campo', img: '/media/flowers/campo.jpg' },
+    { id: 'inverno', name: 'Invernale', img: '/media/flowers/inverno.jpg' },
+    { id: 'ortensie', name: 'Ortensie blu', img: '/media/flowers/ortensie.jpg' },
   ],
 
   tracks: [
