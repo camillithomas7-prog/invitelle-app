@@ -1,0 +1,33 @@
+# Invitelle su hosting Apache/LiteSpeed (Hostinger): stesse rotte di router.php
+Options -Indexes
+DirectoryIndex public/index.php
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# file e cartelle privati: database, codice di servizio, script e log
+RewriteRule ^(data|lib)(/|$) - [F,L]
+RewriteRule ^(router\.php|start\.sh|gen[^/]*\.sh|[^/]*\.log|README\.md|\.git.*)$ - [F,L]
+RewriteRule ^public/assets/i18n/_source - [F,L]
+
+# pagine
+RewriteRule ^$ public/index.php [L,QSA]
+RewriteRule ^editor/?$ public/editor.php [L,QSA]
+RewriteRule ^login/?$ public/login.php [L,QSA]
+RewriteRule ^api/?$ public/api.php [L,QSA]
+RewriteRule ^i/([a-z0-9-]+)/?$ public/invito.php?slug=$1 [L,QSA]
+RewriteRule ^album/([a-z0-9-]+)/?$ public/album.php?slug=$1 [L,QSA]
+
+# file statici (assets, media, caricamenti) serviti dalla cartella public
+RewriteCond %{REQUEST_URI} !^/public/
+RewriteRule ^((assets|media|uploads)/.*)$ public/$1 [L]
+</IfModule>
+
+# cache per video, immagini e font
+<IfModule mod_expires.c>
+ExpiresActive On
+ExpiresByType video/mp4 "access plus 30 days"
+ExpiresByType image/jpeg "access plus 30 days"
+ExpiresByType image/png "access plus 30 days"
+ExpiresByType audio/mpeg "access plus 30 days"
+</IfModule>

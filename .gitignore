@@ -1,0 +1,6 @@
+# dati e caricamenti restano sul server (mai nel repo)
+data/
+public/uploads/*
+!public/uploads/.htaccess
+*.log
+.DS_Store

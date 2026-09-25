@@ -1,0 +1,6 @@
+# nei caricamenti non si esegue mai codice
+<FilesMatch "\.(php|phtml|php\d|phar|cgi|pl|py|sh)$">
+  Require all denied
+</FilesMatch>
+RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .php8
+Options -Indexes -ExecCGI
