@@ -83,8 +83,6 @@ body.locked { overflow: hidden; }
 .fl-l { left: 0; }
 .fl-r { right: 0; transform: scaleX(-1); }
 .has-flowers .blk:nth-child(even) .fl-l, .has-flowers .blk:nth-child(odd) .fl-r { height: min(70%, 260px); opacity: .85; }
-.has-flowers .blk { padding-left: 19%; padding-right: 19%; }
-@media (min-width: 480px) { .has-flowers .blk { padding-left: 100px; padding-right: 100px; } }
 .blk { position: relative; padding: 46px 30px; text-align: center; }
 .blk + .blk::before { content: '❦'; font-family: serif; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); color: var(--accent); opacity: .55; font-size: 18px; }
 .blk.tinted { background: color-mix(in srgb, var(--accent) 7%, transparent); }
@@ -197,7 +195,6 @@ body.locked { overflow: hidden; }
 .blk.photo { background: #555; padding: 70px 22px; margin: 18px 0; overflow: hidden; }
 .blk.photo > .ph-bg { position: absolute; inset: 0; z-index: 0; background: center/cover no-repeat; transition: filter .4s; }
 .ph-bg.bw { filter: grayscale(1) contrast(1.05); }
-.has-flowers .blk.photo { padding-left: 22px; padding-right: 22px; }
 .blk.photo::after { content: ''; position: absolute; inset: 0; background: rgba(15,10,8,var(--dk)); z-index: 0; pointer-events: none; }
 .blk.photo > :not(.ph-bg) { position: relative; z-index: 1; }
 .blk.photo + .blk::before, .blk.photo::before { display: none; }
@@ -217,8 +214,6 @@ body.locked { overflow: hidden; }
 .blk.photo.acc .cd div { background: color-mix(in srgb, var(--accent) 78%, transparent); border-color: color-mix(in srgb, var(--accent) 90%, #fff); color: #fff; }
 .blk.photo.acc .cd b { color: #fff; }
 /* il carosello esce dai margini dei fiori e usa tutta la larghezza */
-.has-flowers .blk .car { margin-left: -30.6%; margin-right: -30.6%; }
-@media (min-width: 480px) { .has-flowers .blk .car { margin-left: -88px; margin-right: -88px; } }
 .car { z-index: 2; }
 
 /* menu lingue (quando sono più di 4) */
@@ -238,3 +233,6 @@ body.locked { overflow: hidden; }
 .env-custom.open .seal { transform: translate(-50%, -38%) scale(.55) rotate(-8deg); opacity: 0; transition: transform .6s ease, opacity .5s ease; }
 .env-custom.open .env-tint { opacity: 0; }
 .env-custom .env-full-hint { bottom: 5%; }
+
+/* bordi decorativi: stanno sotto al contenuto, che resta largo come senza bordi */
+.fl { opacity: .9; }
