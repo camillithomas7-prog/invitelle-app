@@ -242,3 +242,4 @@ body.locked { overflow: hidden; }
 .blk .ico.ico-line { width: 74px; height: 74px; }
 .blk.photo .ico.ico-line { background: var(--icol); padding: 0; }
 .blk.photo.dark .ico.ico-line { background: #fff; }
+

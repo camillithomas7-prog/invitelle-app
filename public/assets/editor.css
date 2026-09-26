@@ -475,3 +475,7 @@ body.wide .pl-table, body.wide .ck-g, body.wide .pl-prog { max-width: 1100px; }
 .icons-pick button.on { border-color: var(--brand); background: var(--brand-soft); box-shadow: 0 0 0 1px var(--brand); }
 .icons-pick .ip { width: 42px; height: 42px; object-fit: contain; border-radius: 8px; }
 .ico-line { display: block; background: var(--icol); -webkit-mask: var(--ico) center / contain no-repeat; mask: var(--ico) center / contain no-repeat; }
+
+.env-mini-css { position: relative; overflow: hidden; }
+.env-mini-css .envx { position: absolute; inset: 0; }
+.env-st .env-photo { background-size: 160% !important; }

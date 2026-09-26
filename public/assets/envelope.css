@@ -1,0 +1,49 @@
+/* ---------- busta personalizzata disegnata dal codice ---------- */
+.envx { position: absolute; inset: 0; container-type: size; overflow: hidden;
+  background: radial-gradient(120% 70% at 50% 30%, #fbf7f0 0%, #efe6d8 55%, #e2d5c2 100%); }
+.envx::before { content: ''; position: absolute; inset: 0; opacity: .35; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.8' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .45 0 0 0 0 .4 0 0 0 .16 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.envx i { position: absolute; display: block; }
+/* la busta: cerniera del lembo al 27% dello schermo, esce dal fondo */
+.ex-env { position: absolute; left: 3%; right: 3%; top: 27%; bottom: -4%; perspective: 1700px; }
+.ex-shadow { position: absolute; inset: 0; border-radius: 1cqw; box-shadow: 0 2.5cqw 8cqw rgba(60,40,20,.32), 0 .5cqw 1.5cqw rgba(60,40,20,.2); }
+.envx .ex-pocket i, .envx .ex-flap, .envx .ex-inside, .envx .ex-liner { background: var(--tex) center / 70cqw auto repeat; }
+.envx .ex-pocket i::before, .envx .ex-flap::before, .envx .ex-inside::before, .envx .ex-liner::before { content: ''; position: absolute; inset: 0; background: var(--env); mix-blend-mode: multiply; }
+.envx .ex-pocket i::after, .envx .ex-flap::after { content: ''; position: absolute; inset: 0; }
+.ex-inside { position: absolute; inset: 0; filter: brightness(.7); border-radius: 1cqw; }
+.ex-inside::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,.35), rgba(0,0,0,.05) 55%); }
+.ex-pocket { position: absolute; inset: 0; z-index: 3; }
+.ex-pocket i { inset: 0; }
+.ex-pocket .pl { clip-path: polygon(0 0, 53% 52%, 0 100%); }
+.ex-pocket .pl::after { background: linear-gradient(100deg, rgba(255,255,255,.18), rgba(0,0,0,.05)); }
+.ex-pocket .pr { clip-path: polygon(100% 0, 47% 52%, 100% 100%); }
+.ex-pocket .pr::after { background: linear-gradient(260deg, rgba(255,255,255,.1), rgba(0,0,0,.09)); }
+.ex-pocket .pb { clip-path: polygon(0 100%, 50% 46%, 100% 100%); filter: drop-shadow(0 -3px 4px rgba(0,0,0,.18)); }
+.ex-pocket .pb::after { background: linear-gradient(to top, rgba(0,0,0,.06), rgba(255,255,255,.12)); }
+.ex-card { position: absolute; left: 7%; right: 7%; top: 4%; height: 64%; z-index: 2; transition: transform 1.2s cubic-bezier(.2,.8,.2,1); }
+.ex-card-in { position: absolute; inset: 0; background: #fffdf7; border-radius: 1.2cqw; box-shadow: 0 1cqw 4cqw rgba(0,0,0,.22); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 4cqw; outline: .35cqw solid #d8c39a; outline-offset: -3cqw; }
+.ex-card-in b { font-family: var(--hf), serif; font-weight: 400; font-size: 8.5cqw; color: #2b2522; line-height: 1.15; padding: 0 9%; }
+.ex-card-in em { font: italic 400 5.2cqw 'Cormorant Garamond', serif; color: #7a6a5a; }
+.ex-fsh { position: absolute; left: 0; right: 0; top: 0; height: 52%; z-index: 4; filter: blur(1.4cqw); transform: translateY(1.2cqw); transition: opacity .4s; }
+.ex-fsh i { inset: 0; background: rgba(0,0,0,.32); clip-path: polygon(0 0, 100% 0, 50% 100%); }
+.ex-flapw { position: absolute; left: 0; right: 0; top: 0; height: 52%; z-index: 5; transform-origin: 50% 0; transform-style: preserve-3d; transition: transform 1.2s cubic-bezier(.45,0,.25,1); }
+.ex-flap, .ex-liner { inset: 0; clip-path: polygon(0 0, 100% 0, 50% 100%); backface-visibility: hidden; }
+.ex-flap::after { background: linear-gradient(to bottom, rgba(255,255,255,.14), rgba(0,0,0,.05)); }
+.ex-liner { transform: rotateX(180deg); filter: brightness(.8); }
+.envx .seal { position: absolute; left: 50%; top: 52%; width: 25cqw; transform: translate(-50%, -42%); z-index: 6; transition: transform .45s ease, opacity .45s ease; }
+.envx .seal span { font-size: 6.8cqw; }
+.ex-fade { position: absolute; inset: 0; background: #f6efe3; opacity: 0; pointer-events: none; transition: opacity .8s ease; z-index: 9; }
+/* sequenza di apertura */
+.env-css.open .seal { transform: translate(-50%, -42%) scale(1.25) rotate(-10deg); opacity: 0; }
+.env-css.open .env-full-hint { opacity: 0; }
+.env-css.flap .ex-flapw { transform: rotateX(-178deg); }
+.env-css.flipped .ex-fsh { opacity: 0; }
+.env-css.flipped .ex-flapw { z-index: 1; }
+.env-css.card .ex-card { transform: translateY(-62%); z-index: 4; }
+.env-css.zoom .ex-card { transform: translateY(-62%) scale(1.5); transition: transform 1s ease-in; }
+.env-css.zoom .ex-fade { opacity: 1; transition-delay: .2s; }
+.envx .seal { background: center/contain no-repeat; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 .8cqw 1.2cqw rgba(0,0,0,.3)); }
+.envx .seal span { position: relative; z-index: 1; font-family: 'Pinyon Script', 'Great Vibes', cursive; color: var(--sealink); opacity: .9; white-space: nowrap; font-weight: 700;
+  text-shadow: -1px -1px 0 rgba(255,255,255,.28), 1px 1px 1px rgba(0,0,0,.55); }
+.envx .seal.tint::after { content: ''; position: absolute; inset: 0; background: var(--sealc); -webkit-mask: var(--sealimg) center/contain no-repeat; mask: var(--sealimg) center/contain no-repeat; mix-blend-mode: multiply; }
+.envx.mini .seal { width: 32cqw; }
+.envx.mini .seal span { font-size: 6cqw; }

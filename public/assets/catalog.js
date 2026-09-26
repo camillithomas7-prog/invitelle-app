@@ -50,15 +50,15 @@ window.INV = {
   // busta personalizzata: foto reale di una busta bianca senza sigillo, colorata dal codice.
   // tipX/tipY = punta del lembo nella foto originale (in %), dove va il sigillo
   customEnvelopes: {
-    ceralacca: { name: 'Carta liscia', poster: '/media/envelopes/custom/liscia.jpg', video: '/media/envelopes/custom/liscia.mp4', tipX: 51, tipY: 60 },
-    floreale: { name: 'Rilievo di rose', poster: '/media/envelopes/custom/floreale.jpg', video: '/media/envelopes/custom/floreale.mp4', tipX: 51, tipY: 65.8 },
-    lino: { name: 'Tela di lino', poster: '/media/envelopes/custom/lino.jpg', video: '/media/envelopes/custom/lino.mp4', tipX: 50, tipY: 58.2 },
-    sfrangiato: { name: 'Bordo sfrangiato', poster: '/media/envelopes/custom/sfrangiato.jpg', video: '/media/envelopes/custom/sfrangiato.mp4', tipX: 50, tipY: 69.5 },
-    artdeco: { name: 'Art Déco', poster: '/media/envelopes/custom/artdeco.jpg', video: '/media/envelopes/custom/artdeco.mp4', tipX: 50, tipY: 64.6 },
-    pizzo: { name: 'Pizzo', poster: '/media/envelopes/custom/pizzo.jpg', video: '/media/envelopes/custom/pizzo.mp4', tipX: 50, tipY: 62.6 },
-    ulivo: { name: 'Rami d\'ulivo', poster: '/media/envelopes/custom/ulivo.jpg', video: '/media/envelopes/custom/ulivo.mp4', tipX: 50, tipY: 66.6 },
-    perlata: { name: 'Carta perlata', poster: '/media/envelopes/custom/perlata.jpg', video: '/media/envelopes/custom/perlata.mp4', tipX: 50, tipY: 68.8 },
-    'fiori-secchi': { name: 'Fiori pressati', poster: '/media/envelopes/custom/fiori-secchi.jpg', video: '/media/envelopes/custom/fiori-secchi.mp4', tipX: 50, tipY: 69.5 },
+    ceralacca: { name: 'Carta liscia', paper: '/media/envelopes/paper/liscia.jpg', poster: '/media/envelopes/custom/liscia.jpg', video: '/media/envelopes/custom/liscia.mp4', tipX: 51, tipY: 60 },
+    floreale: { name: 'Rilievo di rose', paper: '/media/envelopes/paper/floreale.jpg', poster: '/media/envelopes/custom/floreale.jpg', video: '/media/envelopes/custom/floreale.mp4', tipX: 51, tipY: 65.8 },
+    lino: { name: 'Tela di lino', paper: '/media/envelopes/paper/lino.jpg', poster: '/media/envelopes/custom/lino.jpg', video: '/media/envelopes/custom/lino.mp4', tipX: 50, tipY: 58.2 },
+    sfrangiato: { name: 'Bordo sfrangiato', paper: '/media/envelopes/paper/sfrangiato.jpg', poster: '/media/envelopes/custom/sfrangiato.jpg', video: '/media/envelopes/custom/sfrangiato.mp4', tipX: 50, tipY: 69.5 },
+    artdeco: { name: 'Art Déco', paper: '/media/envelopes/paper/artdeco.jpg', poster: '/media/envelopes/custom/artdeco.jpg', video: '/media/envelopes/custom/artdeco.mp4', tipX: 50, tipY: 64.6 },
+    pizzo: { name: 'Pizzo', paper: '/media/envelopes/paper/pizzo.jpg', poster: '/media/envelopes/custom/pizzo.jpg', video: '/media/envelopes/custom/pizzo.mp4', tipX: 50, tipY: 62.6 },
+    ulivo: { name: 'Rami d\'ulivo', paper: '/media/envelopes/paper/ulivo.jpg', poster: '/media/envelopes/custom/ulivo.jpg', video: '/media/envelopes/custom/ulivo.mp4', tipX: 50, tipY: 66.6 },
+    perlata: { name: 'Carta perlata', paper: '/media/envelopes/paper/perlata.jpg', poster: '/media/envelopes/custom/perlata.jpg', video: '/media/envelopes/custom/perlata.mp4', tipX: 50, tipY: 68.8 },
+    'fiori-secchi': { name: 'Fiori pressati', paper: '/media/envelopes/paper/fiori-secchi.jpg', poster: '/media/envelopes/custom/fiori-secchi.jpg', video: '/media/envelopes/custom/fiori-secchi.mp4', tipX: 50, tipY: 69.5 },
   },
 
   seals: [
@@ -266,6 +266,28 @@ INV.iconHTML = (type, variant, color, cls = 'ico') => {
   }
   const url = `/media/icons/line/${INV.iconKey(type)}-${v}.png`;
   return `<span class="${cls} ico-line" style="--ico:url('${url}');--icol:${color || '#a8864f'}"></span>`;
+};
+
+// busta personalizzata disegnata dal codice: carta vera (texture), colore, sigillo e biglietto con i nomi
+INV.envelopeCSS = (e, d, opts = {}) => {
+  const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const col = /^#[0-9a-f]{6}$/i.test(e.color || '') ? e.color : (INV.envelopeColors.find(c => c.id === e.color) || INV.envelopeColors[1]).hex;
+  const seal = INV.sealStyle(e), ce = INV.customEnv(e.style);
+  const names = (d.headline || '').split('\n').map(x => x.trim()).filter(x => x && !/^(ci sposiamo|sposi|we're getting married)$/i.test(x)).join(' ');
+  const hf = d.headlineFont && d.headlineFont !== 'global' ? d.headlineFont : 'Cinzel Decorative';
+  let date = '';
+  if (d.date) { const [y, m, g] = d.date.split('-').map(Number); try { date = new Intl.DateTimeFormat(opts.lang || 'it', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(Date.UTC(y, m - 1, g)); } catch (x) {} }
+  const P = cls => `<i class="${cls}"></i>`;
+  return `<div class="envx ${opts.mini ? 'mini' : ''}" style="--env:${col};--tex:url('${ce.paper}');--hf:'${hf}'">
+    <div class="ex-env"><div class="ex-shadow"></div>
+      <div class="ex-inside"></div>
+      <div class="ex-card"><div class="ex-card-in"><b>${esc(names)}</b><em>${esc(date)}</em></div></div>
+      <div class="ex-pocket">${P('pl')}${P('pr')}${P('pb')}</div>
+      <div class="ex-fsh"><i></i></div>
+      <div class="ex-flapw"><i class="ex-flap"></i><i class="ex-liner"></i></div>
+      <div class="seal ${seal.tint ? 'tint' : ''}" style="background-image:url('${seal.img}');--sealink:${seal.ink};--sealc:${seal.tint || 'transparent'};--sealimg:url('${seal.img}')"><span>${esc(e.initials)}</span></div>
+    </div><div class="ex-fade"></div>
+  </div>`;
 };
 
 INV.fontUrl = (fams) => 'https://fonts.googleapis.com/css2?' + [...new Set(fams)].filter(Boolean)

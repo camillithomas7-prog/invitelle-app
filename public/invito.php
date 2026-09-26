@@ -18,6 +18,7 @@ $theme = $d['theme'] ?? 'amalfi';
 <meta property="og:image" content="/media/themes/<?= h($theme) ?>.jpg">
 <link rel="icon" href="/media/seals/<?= h($d['envelope']['seal'] ?? 'rosso') ?>.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="/assets/envelope.css?v=<?= filemtime(__DIR__ . '/assets/envelope.css') ?>">
 <link rel="stylesheet" href="/assets/invite.css?v=<?= filemtime(__DIR__ . '/assets/invite.css') ?>">
 </head>
 <body>

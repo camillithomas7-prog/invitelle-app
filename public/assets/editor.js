@@ -154,15 +154,12 @@
         <span class="play">${I.play}</span>${t.popular ? '<span class="pop">Popolare</span>' : ''}${!custom && e.template === t.id ? `<span class="chk">${I.check}</span>` : ''}</div>
         <div class="meta"><b>${esc(t.name)}</b><small>${esc(t.desc)}</small></div></button>`).join('')
       + `<button type="button" class="theme ${custom ? 'on' : ''}" data-action="env-custom">
-        ${(() => { const ce = INV.customEnv(e.style);
-          return `<div class="vid env-photo" style="--env:${col};background-image:url('${ce.poster}')"><div class="env-tint"></div>
-          <div class="em-seal ${seal.tint ? 'tint' : ''}" style="left:${ce.tipX}%;top:${ce.tipY}%;background-image:url('${seal.img}');--sealc:${seal.tint || 'transparent'};--sealimg:url('${seal.img}')"><span style="color:${seal.ink}">${esc(e.initials)}</span></div>
-          ${custom ? `<span class="chk">${I.check}</span>` : ''}</div>`; })()}
+        <div class="vid env-mini-css">${INV.envelopeCSS(e, S.details, { mini: true })}${custom ? `<span class="chk">${I.check}</span>` : ''}</div>
         <div class="meta"><b>Busta personalizzata</b><small>Le vostre iniziali sul sigillo, colori a scelta</small></div></button>`;
     const customHTML = custom ? `
       <div class="sec"><h3>1. Inserisci le iniziali</h3>${inp('envelope.initials', 'es. G & M')}<p class="hint">Le iniziali compariranno sul sigillo della busta</p></div>
       <div class="sec"><h3>2. Stile della carta</h3><div class="env-styles">${Object.entries(INV.customEnvelopes).map(([k, ce]) => `<button type="button" class="env-st ${(INV.customEnvelopes[e.style] ? e.style : 'ceralacca') === k ? 'on' : ''}" data-set="envelope.style" data-v="${k}">
-        <div class="env-photo" style="--env:${col};background-image:url('${ce.poster}');--pos:${ce.tipX}% ${ce.tipY}%"><div class="env-tint"></div></div><span>${ce.name}</span></button>`).join('')}</div></div>
+        <div class="env-photo" style="--env:${col};background-image:url('${ce.paper}');--pos:50% 50%"><div class="env-tint"></div></div><span>${ce.name}</span></button>`).join('')}</div></div>
       <div class="sec"><h3>3. Colore della busta</h3><div class="env-cols">${INV.envelopeColors.map(c => `<button type="button" data-set="envelope.color" data-v="${c.id}" class="${e.color === c.id ? 'on' : ''}"><i style="background:${c.hex}"></i>${c.name}</button>`).join('')}
         <div class="env-custom ${isHex(e.color) ? 'on' : ''}">${customPick('envelope.color', isHex(e.color))}</div></div></div>
       <div class="sec"><h3>4. Colore del sigillo</h3><div class="seals">${INV.seals.map(x => `<button type="button" class="seal-c ${e.seal === x.id ? 'on' : ''}" data-set="envelope.seal" data-v="${x.id}">
