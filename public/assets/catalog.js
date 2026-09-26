@@ -45,6 +45,18 @@ window.INV = {
     { id: 'salvia', name: 'Salvia ed eucalipto', desc: 'Carta verde salvia, eucalipto e sigillo oro', poster: '/media/envelopes/salvia.jpg', video: '/media/envelopes/salvia.mp4' },
     { id: 'notte', name: 'Notte stellata', desc: 'Blu notte con stelle in foglia oro', poster: '/media/envelopes/notte.jpg', video: '/media/envelopes/notte.mp4' },
     { id: 'amalfi', name: 'Limoni di Amalfi', desc: 'Acquerello di limoni e maioliche, sigillo bordeaux', poster: '/media/envelopes/amalfi.jpg', video: '/media/envelopes/amalfi.mp4' },
+    { id: 'peonie', name: 'Peonie cipria', desc: 'Acquerello di peonie e rose, sigillo rosa cipria', poster: '/media/envelopes/peonie.jpg', video: '/media/envelopes/peonie.mp4' },
+    { id: 'pizzo', name: 'Pizzo chantilly', desc: 'Pizzo da sposa e perle, sigillo bianco perla', poster: '/media/envelopes/pizzo.jpg', video: '/media/envelopes/pizzo.mp4' },
+    { id: 'marmo', name: 'Marmo e oro', desc: 'Carta effetto marmo di Carrara, venature e sigillo oro', poster: '/media/envelopes/marmo.jpg', video: '/media/envelopes/marmo.mp4' },
+    { id: 'glicine', name: 'Glicine', desc: 'Cascata di glicine ad acquerello, sigillo lavanda', poster: '/media/envelopes/glicine.jpg', video: '/media/envelopes/glicine.mp4' },
+    { id: 'bordeaux', name: 'Velluto bordeaux', desc: 'Rosso vino con bordo oro e rosa essiccata', poster: '/media/envelopes/bordeaux.jpg', video: '/media/envelopes/bordeaux.mp4' },
+    { id: 'uliveto', name: 'Uliveto', desc: 'Carta a mano, ramo d\'ulivo e sigillo verde oliva', poster: '/media/envelopes/uliveto.jpg', video: '/media/envelopes/uliveto.mp4' },
+    { id: 'riviera', name: 'Riviera', desc: 'Onde, conchiglie e bouganville, sigillo blu navy', poster: '/media/envelopes/riviera.jpg', video: '/media/envelopes/riviera.mp4' },
+    { id: 'pampas', name: 'Boho pampas', desc: 'Pampas e fiori secchi, sigillo terracotta', poster: '/media/envelopes/pampas.jpg', video: '/media/envelopes/pampas.mp4' },
+    { id: 'rose-bianche', name: 'Rose bianche', desc: 'Bouquet di rose bianche e fiocco di raso, sigillo avorio', poster: '/media/envelopes/rose-bianche.jpg', video: '/media/envelopes/rose-bianche.mp4' },
+    { id: 'vigneto', name: 'Colline toscane', desc: 'Cipressi e vigneti al tramonto, sigillo verde bosco', poster: '/media/envelopes/vigneto.jpg', video: '/media/envelopes/vigneto.mp4' },
+    { id: 'inverno', name: 'Giardino d\'inverno', desc: 'Fiocchi di neve argento e rami di pino, sigillo argento', poster: '/media/envelopes/inverno.jpg', video: '/media/envelopes/inverno.mp4' },
+    { id: 'art-deco', name: 'Art déco', desc: 'Nero e oro in stile anni \'20, sigillo oro', poster: '/media/envelopes/art-deco.jpg', video: '/media/envelopes/art-deco.mp4' },
   ],
 
   // busta personalizzata: foto reale di una busta bianca senza sigillo, colorata dal codice.
