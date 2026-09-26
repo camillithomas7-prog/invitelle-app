@@ -45,8 +45,8 @@
     const col = /^#[0-9a-f]{6}$/i.test(e.color || '') ? e.color : (INV.envelopeColors.find(c => c.id === e.color) || INV.envelopeColors[1]).hex;
     const seal = INV.sealStyle(e);
     // busta personalizzata: disegnata dal codice con la carta scelta
-    INV.loadFonts([S.details.headlineFont === 'global' ? S.blocksStyle.font : S.details.headlineFont, 'Pinyon Script']);
-    return `<div class="env-full env-css" id="envelope" data-full="1" data-css="1">${INV.envelopeCSS(e, S.details, { lang, kicker: T('rsvp') ? '' : '' })}
+    INV.loadFonts(['Pinyon Script']);
+    return `<div class="env-full env-css" id="envelope" data-full="1" data-css="1">${INV.envelopeCSS(e, S.details)}
       <div class="env-full-hint"><span>${esc(T('tap'))}</span><i></i></div></div>`;
     const theme = INV.themes.find(t => t.id === S.theme) || INV.themes[0];
     const emboss = `url('${(INV.flowers.find(f => f.id === 'classico')).img}')`;
@@ -346,13 +346,14 @@
     };
     if (instant) { scr.classList.add('gone'); document.body.classList.remove('locked'); if (!root.classList.contains('played')) play(root); return; }
     if (env.dataset.css) {
+      // stessa sequenza dei video delle buste pronte: sigillo, lembo che si solleva, luce, si entra nella busta
       if (env.classList.contains('open')) return;
-      env.classList.add('open');                               // il sigillo si stacca
-      setTimeout(() => env.classList.add('flap'), 350);        // il lembo si solleva
-      setTimeout(() => env.classList.add('flipped'), 900);     // il lembo passa dietro al biglietto
-      setTimeout(() => env.classList.add('card'), 1350);       // esce il biglietto
-      setTimeout(() => env.classList.add('zoom'), 2500);       // il biglietto si avvicina
-      setTimeout(done, 3300);
+      env.classList.add('open');
+      setTimeout(() => env.classList.add('flap'), 380);
+      setTimeout(() => env.classList.add('glow'), 900);
+      setTimeout(() => env.classList.add('push'), 1250);
+      setTimeout(() => env.classList.add('fade'), 2350);
+      setTimeout(done, 3200);
       return;
     }
     if (env.dataset.full) {

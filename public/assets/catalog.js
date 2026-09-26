@@ -50,15 +50,15 @@ window.INV = {
   // busta personalizzata: foto reale di una busta bianca senza sigillo, colorata dal codice.
   // tipX/tipY = punta del lembo nella foto originale (in %), dove va il sigillo
   customEnvelopes: {
-    ceralacca: { name: 'Carta liscia', paper: '/media/envelopes/paper/liscia.jpg', poster: '/media/envelopes/custom/liscia.jpg', video: '/media/envelopes/custom/liscia.mp4', tipX: 51, tipY: 60 },
-    floreale: { name: 'Rilievo di rose', paper: '/media/envelopes/paper/floreale.jpg', poster: '/media/envelopes/custom/floreale.jpg', video: '/media/envelopes/custom/floreale.mp4', tipX: 51, tipY: 65.8 },
-    lino: { name: 'Tela di lino', paper: '/media/envelopes/paper/lino.jpg', poster: '/media/envelopes/custom/lino.jpg', video: '/media/envelopes/custom/lino.mp4', tipX: 50, tipY: 58.2 },
-    sfrangiato: { name: 'Bordo sfrangiato', paper: '/media/envelopes/paper/sfrangiato.jpg', poster: '/media/envelopes/custom/sfrangiato.jpg', video: '/media/envelopes/custom/sfrangiato.mp4', tipX: 50, tipY: 69.5 },
-    artdeco: { name: 'Art Déco', paper: '/media/envelopes/paper/artdeco.jpg', poster: '/media/envelopes/custom/artdeco.jpg', video: '/media/envelopes/custom/artdeco.mp4', tipX: 50, tipY: 64.6 },
-    pizzo: { name: 'Pizzo', paper: '/media/envelopes/paper/pizzo.jpg', poster: '/media/envelopes/custom/pizzo.jpg', video: '/media/envelopes/custom/pizzo.mp4', tipX: 50, tipY: 62.6 },
-    ulivo: { name: 'Rami d\'ulivo', paper: '/media/envelopes/paper/ulivo.jpg', poster: '/media/envelopes/custom/ulivo.jpg', video: '/media/envelopes/custom/ulivo.mp4', tipX: 50, tipY: 66.6 },
-    perlata: { name: 'Carta perlata', paper: '/media/envelopes/paper/perlata.jpg', poster: '/media/envelopes/custom/perlata.jpg', video: '/media/envelopes/custom/perlata.mp4', tipX: 50, tipY: 68.8 },
-    'fiori-secchi': { name: 'Fiori pressati', paper: '/media/envelopes/paper/fiori-secchi.jpg', poster: '/media/envelopes/custom/fiori-secchi.jpg', video: '/media/envelopes/custom/fiori-secchi.mp4', tipX: 50, tipY: 69.5 },
+    ceralacca: { name: 'Carta liscia', paper: '/media/envelopes/paper/liscia.jpg', poster: '/media/envelopes/custom/liscia.jpg', video: '/media/envelopes/custom/liscia.mp4', tipX: 50.5, tipY: 60.3, yL: 31, yR: 32 },
+    floreale: { name: 'Rilievo di rose', paper: '/media/envelopes/paper/floreale.jpg', poster: '/media/envelopes/custom/floreale.jpg', video: '/media/envelopes/custom/floreale.mp4', tipX: 50.5, tipY: 65.8, yL: 34, yR: 34 },
+    lino: { name: 'Tela di lino', paper: '/media/envelopes/paper/lino.jpg', poster: '/media/envelopes/custom/lino.jpg', video: '/media/envelopes/custom/lino.mp4', tipX: 50.5, tipY: 58.3, yL: 32.6, yR: 33.2 },
+    sfrangiato: { name: 'Bordo sfrangiato', paper: '/media/envelopes/paper/sfrangiato.jpg', poster: '/media/envelopes/custom/sfrangiato.jpg', video: '/media/envelopes/custom/sfrangiato.mp4', tipX: 50.5, tipY: 69.7, yL: 39.4, yR: 40.5 },
+    artdeco: { name: 'Art Déco', paper: '/media/envelopes/paper/artdeco.jpg', poster: '/media/envelopes/custom/artdeco.jpg', video: '/media/envelopes/custom/artdeco.mp4', tipX: 50.5, tipY: 64.9, yL: 37.1, yR: 37.3 },
+    pizzo: { name: 'Pizzo', paper: '/media/envelopes/paper/pizzo.jpg', poster: '/media/envelopes/custom/pizzo.jpg', video: '/media/envelopes/custom/pizzo.mp4', tipX: 50.5, tipY: 62.7, yL: 34.2, yR: 34.6 },
+    ulivo: { name: 'Rami d\'ulivo', paper: '/media/envelopes/paper/ulivo.jpg', poster: '/media/envelopes/custom/ulivo.jpg', video: '/media/envelopes/custom/ulivo.mp4', tipX: 50.5, tipY: 66.6, yL: 36, yR: 36 },
+    perlata: { name: 'Carta perlata', paper: '/media/envelopes/paper/perlata.jpg', poster: '/media/envelopes/custom/perlata.jpg', video: '/media/envelopes/custom/perlata.mp4', tipX: 50.5, tipY: 68.4, yL: 37.4, yR: 40.1 },
+    'fiori-secchi': { name: 'Fiori pressati', paper: '/media/envelopes/paper/fiori-secchi.jpg', poster: '/media/envelopes/custom/fiori-secchi.jpg', video: '/media/envelopes/custom/fiori-secchi.mp4', tipX: 50.5, tipY: 69.5, yL: 39.2, yR: 40.2 },
   },
 
   seals: [
@@ -268,25 +268,22 @@ INV.iconHTML = (type, variant, color, cls = 'ico') => {
   return `<span class="${cls} ico-line" style="--ico:url('${url}');--icol:${color || '#a8864f'}"></span>`;
 };
 
-// busta personalizzata disegnata dal codice: carta vera (texture), colore, sigillo e biglietto con i nomi
+// busta personalizzata: la foto vera della carta scelta (come le buste pronte), colorata dal codice,
+// con sigillo e iniziali sulla punta. Il lembo è la stessa foto ritagliata lungo i suoi bordi: all'apertura si solleva.
 INV.envelopeCSS = (e, d, opts = {}) => {
   const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const col = /^#[0-9a-f]{6}$/i.test(e.color || '') ? e.color : (INV.envelopeColors.find(c => c.id === e.color) || INV.envelopeColors[1]).hex;
   const seal = INV.sealStyle(e), ce = INV.customEnv(e.style);
-  const names = (d.headline || '').split('\n').map(x => x.trim()).filter(x => x && !/^(ci sposiamo|sposi|we're getting married)$/i.test(x)).join(' ');
-  const hf = d.headlineFont && d.headlineFont !== 'global' ? d.headlineFont : 'Cinzel Decorative';
-  let date = '';
-  if (d.date) { const [y, m, g] = d.date.split('-').map(Number); try { date = new Intl.DateTimeFormat(opts.lang || 'it', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(Date.UTC(y, m - 1, g)); } catch (x) {} }
-  const P = cls => `<i class="${cls}"></i>`;
-  return `<div class="envx ${opts.mini ? 'mini' : ''}" style="--env:${col};--tex:url('${ce.paper}');--hf:'${hf}'">
-    <div class="ex-env"><div class="ex-shadow"></div>
-      <div class="ex-inside"></div>
-      <div class="ex-card"><div class="ex-card-in"><b>${esc(names)}</b><em>${esc(date)}</em></div></div>
-      <div class="ex-pocket">${P('pl')}${P('pr')}${P('pb')}</div>
-      <div class="ex-fsh"><i></i></div>
-      <div class="ex-flapw"><i class="ex-flap"></i><i class="ex-liner"></i></div>
+  const up = .7;   // il ritaglio sta un filo sopra l'ombra del lembo, che resta sulla busta
+  const flap = `polygon(0 0, 100% 0, 100% ${ce.yR - up}%, ${ce.tipX}% ${ce.tipY - up}%, 0 ${ce.yL - up}%)`;
+  const body = `polygon(0 ${ce.yL - up}%, ${ce.tipX}% ${ce.tipY - up}%, 100% ${ce.yR - up}%, 100% 100%, 0 100%)`;
+  return `<div class="ep ${opts.mini ? 'mini' : ''}" style="--env:${col};--photo:url('${ce.poster}');--tx:${ce.tipX}%;--ty:${ce.tipY}%;--my:${(ce.yL + ce.yR) / 2}%">
+    <div class="ep-scene">
+      <div class="ep-inside"></div><div class="ep-card"></div>
+      <div class="ep-body" style="clip-path:${body}"></div>
+      <div class="ep-flapw"><div class="ep-flap" style="clip-path:${flap}"></div></div>
       <div class="seal ${seal.tint ? 'tint' : ''}" style="background-image:url('${seal.img}');--sealink:${seal.ink};--sealc:${seal.tint || 'transparent'};--sealimg:url('${seal.img}')"><span>${esc(e.initials)}</span></div>
-    </div><div class="ex-fade"></div>
+    </div><div class="ep-fade"></div>
   </div>`;
 };
 

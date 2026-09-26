@@ -478,4 +478,4 @@ body.wide .pl-table, body.wide .ck-g, body.wide .pl-prog { max-width: 1100px; }
 
 .env-mini-css { position: relative; overflow: hidden; }
 .env-mini-css .envx { position: absolute; inset: 0; }
-.env-st .env-photo { background-size: 160% !important; }
+.env-st .env-photo { background-size: 180% !important; }
