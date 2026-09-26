@@ -31,6 +31,14 @@ window.INV = {
     { id: '#3b4148', name: 'Antracite' }, { id: '#b76e79', name: 'Oro rosa' }, { id: '#ffffff', name: 'Bianco puro' }, { id: '#f4ecd8', name: 'Crema' },
   ],
 
+  // colori di sfondo dell'invito (la "carta" sotto i blocchi)
+  paperColors: [
+    { id: '#fbf8f2', name: 'Avorio' }, { id: '#ffffff', name: 'Bianco' }, { id: '#f5ecdc', name: 'Crema' }, { id: '#efe6d8', name: 'Sabbia' },
+    { id: '#f7e9e6', name: 'Cipria' }, { id: '#f3e3e6', name: 'Rosa antico' }, { id: '#e8ede2', name: 'Salvia' }, { id: '#eee9f3', name: 'Lavanda' },
+    { id: '#e6eef4', name: 'Azzurro' }, { id: '#eceae6', name: 'Grigio perla' }, { id: '#1f2a44', name: 'Blu notte' }, { id: '#24362c', name: 'Verde bosco' },
+    { id: '#4a1c26', name: 'Bordeaux' }, { id: '#171717', name: 'Nero' },
+  ],
+
   accents: ['', '#6b7a3a', '#5e9e7a', '#2f5d4a', '#d88a98', '#c0566a', '#7a2331', '#e0824a', '#5aa9d6', '#4a7fb5', '#1f3a60', '#a58bd6', '#d4a82a', '#c8643a', '#3b4148'],
 
   envelopeColors: [

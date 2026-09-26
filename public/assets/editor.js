@@ -57,11 +57,16 @@
   const panel = $('#panel');
 
   // ---------- stato, salvataggio, anteprima ----------
+  const isHex = v => /^#[0-9a-f]{6}$/i.test(v || '');
   const get = (path) => path.split('.').reduce((o, k) => o?.[k], S);
   const set = (path, val) => {
     const ks = path.split('.'); const last = ks.pop();
     const o = ks.reduce((o, k) => o[k], S); o[last] = val;
+    // sfondo scuro con testo scuro (o chiaro con chiaro): il testo dei blocchi si adegua da solo per restare leggibile
+    if (path === 'blocksStyle.bg' && isHex(val) && isHex(S.blocksStyle.color) && lum(val) < 0.45 === lum(S.blocksStyle.color) < 0.45)
+      S.blocksStyle.color = lum(val) < 0.45 ? '#f4ecd8' : '#1c1c1c';
   };
+  const lum = hex => { const n = parseInt(hex.slice(1), 16); return ((n >> 16) * .299 + (n >> 8 & 255) * .587 + (n & 255) * .114) / 255; };
   let saveT = null, pvT = null;
   function changed(rerender) {
     $('#save-state').classList.add('busy'); $('#save-state span').textContent = 'Salvataggio...';
@@ -116,7 +121,6 @@
   const area = (path, ph = '') => `<textarea class="in" data-k="${path}" placeholder="${esc(ph)}">${esc(get(path))}</textarea>`;
   // colore libero: tavolozza completa (qualsiasi colore e sfumatura) + codice esadecimale
   const RAINBOW = 'conic-gradient(#f44, #fb3, #ee4, #4d6, #4cf, #46f, #b4f, #f4a, #f44)';
-  const isHex = v => /^#[0-9a-f]{6}$/i.test(v || '');
   const customPick = (path, isCustom, label = 'Personalizzato') => {
     const v = get(path);
     return `<label class="cpick ${isCustom ? 'on' : ''}" title="Scegli qualsiasi colore"><i style="background:${isCustom ? v : RAINBOW}"></i><span>${label}</span>
@@ -140,7 +144,14 @@
         <div class="vid" style="background-image:url('${t.poster}')"><video src="${t.video}" poster="${t.poster}" muted loop playsinline preload="none"></video>
         <span class="play">${I.play}</span>${t.popular ? '<span class="pop">Popolare</span>' : ''}${S.theme === t.id ? `<span class="chk">${I.check}</span>` : ''}</div>
         <div class="meta"><b>${esc(t.name)}</b><small>${esc(t.desc)}</small></div></button>`).join('')}
-        </div>`;
+        </div>${paperSec()}`;
+  }
+  // colore di sfondo dell'invito (sotto l'animazione iniziale, dietro a tutti i blocchi)
+  function paperSec() {
+    const v = S.blocksStyle.bg || '#fbf8f2', custom = !INV.paperColors.some(c => c.id === v);
+    return `<div class="sec" style="margin-top:26px"><h3>Colore di sfondo dell'invito</h3>
+      <p class="hint" style="margin:-6px 0 12px">Lo sfondo che gli ospiti vedono sotto l'animazione iniziale, dietro a tutti i blocchi. Con uno sfondo scuro il testo diventa chiaro da solo.</p>
+      <div class="colors">${INV.paperColors.map(c => `<button type="button" data-set="blocksStyle.bg" data-v="${c.id}" class="${v === c.id ? 'on' : ''}"><i style="background:${c.id}"></i>${c.name}</button>`).join('')}${customPick('blocksStyle.bg', custom)}</div></div>`;
   }
 
   // ---------- TAB: BUSTA ----------

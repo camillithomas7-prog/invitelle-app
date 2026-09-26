@@ -229,6 +229,9 @@
     root.style.setProperty('--bf', `'${bs.font}', serif`);
     root.style.setProperty('--tc', d.textColor);
     root.style.setProperty('--bc', bs.color);
+    const bg = /^#[0-9a-f]{6}$/i.test(bs.bg || '') ? bs.bg : '#fbf8f2';
+    root.style.setProperty('--paper', bg);
+    root.classList.toggle('dark-paper', !isLight(bg));
 
     // intro: il video non si ricrea se il tema non cambia (evita che riparta)
     let intro = $('.intro', root);
