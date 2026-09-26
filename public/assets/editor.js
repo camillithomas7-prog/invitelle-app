@@ -41,6 +41,7 @@
   };
 
   let S = window.__INVITE.data;
+  if (!S.blocksStyle.iconColor) S.blocksStyle.iconColor = '#a8864f';
   S.album = Object.assign({ cardStyle: 'avorio', enabled: true, askName: true, cardTitle: 'Condividi i tuoi scatti', cardText: 'Inquadra il codice e carica le foto e i video della festa' }, S.album || {});
   // aggiorna i blocchi "La nostra storia" creati con la versione precedente
   (S.blocks || []).filter(b => b.type === 'story').forEach(b => {
@@ -273,6 +274,11 @@
     return t && t !== INV.blockTypes[b.type].name ? `<small>${esc(t)}</small>` : '';
   }
 
+  function iconPicker(path, type, cur, accent) {
+    const col = accent || S.blocksStyle.iconColor || '#a8864f';
+    return `<label class="l">Icona</label><div class="icons-pick">${[0, 1, 2, 3, 4, 5].map(v => `<button type="button" class="${(+cur || 0) === v ? 'on' : ''}" data-set="${path}" data-v="${v}" title="${v ? 'Linea ' + v : 'Classica 3D'}">${INV.iconHTML(type, v, col, 'ip')}</button>`).join('')}</div>
+      <p class="hint">La prima è l'icona classica 3D; le altre sono a linea sottile e prendono il colore delle icone.</p>`;
+  }
   function tabBlocks() {
     const bs = S.blocksStyle;
     const list = S.blocks.map((b, i) => {
@@ -284,6 +290,7 @@
           <button type="button" class="ibtn" data-action="vis-block" data-i="${i}" title="${b.visible ? 'Nascondi' : 'Mostra'}">${b.visible ? I.eye : I.eyeOff}</button>
           <button type="button" class="ibtn del" data-action="del-block" data-i="${i}" title="Elimina">${I.trash}</button></div>
         ${open ? `<div class="blk-b">${(F[b.type] || []).map(f => field(`blocks.${i}.data`, f)).join('')}
+          ${b.type !== 'drawing' ? iconPicker(`blocks.${i}.icon`, b.type, b.icon, b.accent) : ''}
           <label class="l">Colore del blocco</label><div class="accents">${INV.accents.map(a => `<button type="button" class="${a ? '' : 'none'} ${b.accent === a ? 'on' : ''}" style="${a ? `background:${a}` : ''}" data-set="blocks.${i}.accent" data-v="${a}">${a ? '' : '✕'}</button>`).join('')}
             <label class="acc-pick ${b.accent && !INV.accents.includes(b.accent) ? 'on' : ''}" title="Scegli qualsiasi colore" style="background:${b.accent && !INV.accents.includes(b.accent) ? b.accent : RAINBOW}"><input type="color" data-k="blocks.${i}.accent" value="${isHex(b.accent) ? b.accent : '#a8864f'}"></label></div>
           ${b.accent && !INV.accents.includes(b.accent) ? `<input class="in hex" style="margin-top:8px;width:110px" data-hex="blocks.${i}.accent" value="${esc(b.accent)}" maxlength="7" spellcheck="false">` : ''}
@@ -292,7 +299,9 @@
     }).join('');
     return `<h2>Blocchi</h2><p class="lead">Le sezioni che gli ospiti vedono scorrendo l'invito.</p>
       <div class="sec"><h3>Font <span style="font-family:Inter;font-size:12px;color:var(--mute);font-weight:400">(per i blocchi)</span></h3>${fontGrid('blocksStyle.font')}
-        <label class="l">Colore del testo <span style="font-weight:400;color:var(--mute)">(per i blocchi)</span></label>${colorRow('blocksStyle.color')}</div>
+        <label class="l">Colore del testo <span style="font-weight:400;color:var(--mute)">(per i blocchi)</span></label>${colorRow('blocksStyle.color')}
+        <label class="l">Colore delle icone <span style="font-weight:400;color:var(--mute)">(icone a linea)</span></label>${colorRow('blocksStyle.iconColor')}
+        <div class="rowx" style="margin-top:10px;gap:8px;flex-wrap:wrap"><span class="hint" style="margin:0">Stessa icona per tutti i blocchi:</span>${[0, 1, 2, 3, 4, 5].map(v => `<button type="button" class="btn sm" data-action="icons-all" data-v="${v}">${v ? 'Linea ' + v : 'Classica 3D'}</button>`).join('')}</div></div>
       <div class="sec"><div class="box soft"><b style="font-size:13px">Bordi floreali</b><p class="hint" style="margin:2px 0 10px">Decorazioni floreali ai lati dei blocchi</p>
         <div class="flow">${INV.flowers.map(f => `<button type="button" data-set="blocksStyle.flowers" data-v="${f.id}" class="${bs.flowers === f.id ? 'on' : ''}"><div style="${f.img ? `background-image:url('${f.img}')` : ''}">${f.img ? '' : '✕'}</div>${f.name}</button>`).join('')}</div></div></div>
       <div class="sec"><h3>Blocchi attivi</h3><p class="hint" style="margin:-6px 0 12px">Trascina per riordinare · Clicca per modificare · Occhio per nascondere</p>
@@ -445,7 +454,8 @@
         <button type="button" class="btn sm" data-action="add-item" data-p="rsvp.custom.${i}.options" data-tpl='""'>${I.plus} Opzione</button>` : ''}</div>`).join('');
     return `<h2>Domande RSVP</h2><p class="lead">Scegli quali domande vedranno gli ospiti nel modulo di conferma.</p>
       <div class="box"><div class="tog"><div class="ic">${I.users}</div><div class="tx"><b>Modulo RSVP attivo</b><small>Mostra il modulo di conferma in fondo all'invito</small></div>${sw('rsvp.enabled', r.enabled)}</div>
-        <label class="l">Titolo del modulo</label>${inp('rsvp.title')}</div>
+        <label class="l">Titolo del modulo</label>${inp('rsvp.title')}
+        ${iconPicker('rsvp.icon', 'rsvp', S.rsvp.icon)}</div>
       <div class="box"><h3 class="serif" style="margin:0 0 4px;font-size:16px">Domande standard</h3>
         <div class="box soft" style="margin:10px 0 4px;font-size:12px"><b>Numero di ospiti</b><br><span style="color:var(--mute)">Si gestisce per ogni ospite nella scheda Ospiti: imposta "Posti" maggiore di 1 per permettere accompagnatori. Il modulo chiederà il numero solo a chi ne ha diritto.</span></div>
         ${tog('msg', 'Messaggio personale', 'Gli ospiti possono lasciarvi un messaggio', 'rsvp.message')}
@@ -692,6 +702,7 @@
         setStart(ac.dataset.d === 'reset' ? 0 : cur + +ac.dataset.d, true); } break;
       case 'focus-reset': Object.assign(get(ac.dataset.p), { posX: 50, posY: 50, zoom: 100 }); changed(true); break;
       case 'lang-rm': S.languages.extra = (S.languages.extra || []).filter(l => l !== ac.dataset.l); changed(true); break;
+      case 'icons-all': { const v = +ac.dataset.v; S.blocks.forEach(b => b.icon = v); S.rsvp.icon = v; changed(true); toast(v ? 'Icone a linea applicate a tutti i blocchi' : 'Icone classiche 3D ripristinate'); } break;
       case 'custom-msg': showCustomMsg = !showCustomMsg; render(); break;
       case 'reminders': {
         const list = guestsData.guests.filter(g => g.status === 'pending' && g.phone);

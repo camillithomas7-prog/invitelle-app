@@ -468,3 +468,10 @@ body.wide .pl-table, body.wide .ck-g, body.wide .pl-prog { max-width: 1100px; }
 .env-st .env-photo { position: relative; aspect-ratio: 1; border-radius: 7px; overflow: hidden; background-size: 260% !important; background-position: var(--pos) !important; }
 .env-st span { display: block; font-size: 12px; margin-top: 6px; }
 .env-st.on { border-color: var(--brand); background: var(--brand-soft); box-shadow: 0 0 0 1px var(--brand); }
+
+/* scelta icona del blocco */
+.icons-pick { display: flex; gap: 8px; flex-wrap: wrap; }
+.icons-pick button { width: 62px; height: 62px; border: 1px solid var(--line); border-radius: 12px; background: #fff; display: flex; align-items: center; justify-content: center; padding: 8px; }
+.icons-pick button.on { border-color: var(--brand); background: var(--brand-soft); box-shadow: 0 0 0 1px var(--brand); }
+.icons-pick .ip { width: 42px; height: 42px; object-fit: contain; border-radius: 8px; }
+.ico-line { display: block; background: var(--icol); -webkit-mask: var(--ico) center / contain no-repeat; mask: var(--ico) center / contain no-repeat; }

@@ -256,6 +256,18 @@ INV.loadLangs = (codes) => Promise.all([...new Set(codes)].map(INV.loadLang));
 
 INV.customEnv = (style) => INV.customEnvelopes[style] || INV.customEnvelopes.ceralacca;
 
+// icona di un blocco: 0 = classica 3D (colori originali), 1-5 = linea sottile colorabile
+INV.iconKey = (type) => type === 'rsvp' ? 'rsvp' : (INV.blockTypes[type] ? type : 'text');
+INV.iconHTML = (type, variant, color, cls = 'ico') => {
+  const v = +variant || 0;
+  if (!v) {
+    const src = type === 'rsvp' ? '/media/icons/icon-feat-guests.png' : `/media/icons/icon-blk-${(INV.blockTypes[type] || {}).icon || 'text'}.png`;
+    return `<img class="${cls}" src="${src}" alt="">`;
+  }
+  const url = `/media/icons/line/${INV.iconKey(type)}-${v}.png`;
+  return `<span class="${cls} ico-line" style="--ico:url('${url}');--icol:${color || '#a8864f'}"></span>`;
+};
+
 INV.fontUrl = (fams) => 'https://fonts.googleapis.com/css2?' + [...new Set(fams)].filter(Boolean)
   .map(f => 'family=' + f.replace(/ /g, '+')).join('&') + '&display=swap';
 

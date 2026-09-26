@@ -4,3 +4,4 @@ public/uploads/*
 !public/uploads/.htaccess
 *.log
 .DS_Store
+sorgenti/

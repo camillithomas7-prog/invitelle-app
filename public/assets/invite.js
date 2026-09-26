@@ -127,7 +127,7 @@
     if (!type || !blockRender[b.type]) return '';
     const acc = b.accent || '';
     const style = acc ? `style="--accent:${acc};--accent-strong:${acc}"` : '';
-    const icon = b.type !== 'drawing' ? `<img class="ico" src="/media/icons/icon-blk-${type.icon}.png" alt="">` : '';
+    const icon = b.type !== 'drawing' ? INV.iconHTML(b.type, b.icon, b.accent || S.blocksStyle.iconColor) : '';
     // conto alla rovescia con foto di sfondo (facoltativamente oscurata)
     const photo = b.type === 'countdown' && b.data.image;
     if (photo) {
@@ -150,7 +150,7 @@
       return lbl + `<div class="opts">${(q.options || []).filter(Boolean).map(o => `<label class="opt"><input type="radio" name="q_${q.id}" value="${esc(o)}" ${q.required ? 'required' : ''}>${esc(o)}</label>`).join('')}</div>`;
     }).join('');
     const g = guest || {};
-    return `<section class="blk rsvp reveal" data-block="rsvp"><i class="fl fl-l"></i><i class="fl fl-r"></i><img class="ico" src="/media/icons/icon-feat-guests.png" alt="">
+    return `<section class="blk rsvp reveal" data-block="rsvp"><i class="fl fl-l"></i><i class="fl fl-r"></i>${INV.iconHTML('rsvp', S.rsvp.icon, S.blocksStyle.iconColor)}
       <h2>${esc(lang === S.languages.main ? r.title || T('rsvp') : T('rsvp'))}</h2>${r.deadline ? `<p class="sub">${T('replyBy')} ${esc(fmtDate(r.deadline))}</p>` : ''}
       <div id="rsvp-box"><form id="rsvp-form" novalidate>
         <label class="f">${T('name')} *</label><input type="text" name="name" required value="${esc(g.name)}">
