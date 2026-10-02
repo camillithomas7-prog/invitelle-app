@@ -103,6 +103,14 @@ window.INV = {
     { id: 'ortensie', name: 'Ortensie blu', img: '/media/flowers/ortensie.webp' },
   ],
 
+  // illustrazioni ad acquerello pronte per il blocco "Disegno" (sfondo bianco, sulla carta si fondono come stampate)
+  drawings: [
+    { id: 'sposi-mano', name: 'Sposi mano nella mano' }, { id: 'sposi-arco', name: 'Sotto l\'arco di rose' }, { id: 'sposi-ballo', name: 'Il primo ballo' },
+    { id: 'sposi-vespa', name: 'In Vespa' }, { id: 'villa-mare', name: 'Villa sul mare' }, { id: 'chiesa', name: 'Chiesetta tra i cipressi' },
+    { id: 'casale', name: 'Casale in Toscana' }, { id: 'torta', name: 'Torta nuziale' }, { id: 'brindisi', name: 'Brindisi' },
+    { id: 'fedi', name: 'Le fedi' }, { id: 'bouquet', name: 'Bouquet' }, { id: 'auto', name: 'Auto d\'epoca' },
+  ].map(d => Object.assign(d, { img: `/media/drawings/${d.id}.webp`, thumb: `/media/drawings/${d.id}-thumb.webp` })),
+
   tracks: [
     { id: 'dolce-piano', name: 'Dolce Piano', desc: 'Melodia romantica al pianoforte', src: '/media/music/dolce-piano.mp3' },
     { id: 'archi-lago', name: 'Archi sul Lago', desc: 'Quartetto d\'archi elegante', src: '/media/music/archi-lago.mp3' },

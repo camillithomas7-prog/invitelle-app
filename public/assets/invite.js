@@ -146,7 +146,8 @@
     if (!type || !blockRender[b.type]) return '';
     const acc = b.accent || '';
     const style = acc ? `style="--accent:${acc};--accent-strong:${acc}"` : '';
-    const icon = b.type !== 'drawing' ? INV.iconHTML(b.type, b.icon, b.accent || S.blocksStyle.iconColor) : '';
+    let icon = b.type !== 'drawing' ? INV.iconHTML(b.type, b.icon, b.iconColor || b.accent || S.blocksStyle.iconColor) : '';
+    if (b.iconColor) icon = icon.replace('class="ico ico-line"', 'data-own class="ico ico-line"');   // colore scelto: vale anche sulle foto scure
     // conto alla rovescia con foto di sfondo (facoltativamente oscurata)
     const photo = b.type === 'countdown' && b.data.image;
     if (photo) {

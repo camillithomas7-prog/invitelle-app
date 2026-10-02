@@ -262,7 +262,7 @@
       ['darken', 'Oscura la foto', 'toggle', 'Rende più leggibili titolo e numeri sopra la foto', 'image'], ['darkness', 'Quanto oscurare', 'range', [10, 85, '%'], 'darken']],
     venue: [['title', 'Titolo'], ['days', 'Luoghi', 'list', [['label', 'Giorno / etichetta', 'text', 'es. Sabato 19 giugno'], ['name', 'Nome del luogo'], ['address', 'Indirizzo'], ['maps', 'Link Google Maps', 'maps'], ['image', 'Immagine del luogo', 'image']], 'Aggiungi luogo', { label: 'Nuovo giorno', name: '', address: '', maps: '', image: '' }]],
     destination: [['title', 'Titolo'], ['place', 'Luogo'], ['text', 'Descrizione', 'area'], ['image', 'Immagine', 'image'], ['tips', 'Informazioni utili', 'area']],
-    drawing: [['image', 'Disegno o illustrazione', 'image'], ['caption', 'Didascalia']],
+    drawing: [['image', 'Scegli un\'illustrazione', 'drawing'], ['image', 'Oppure carica la tua immagine', 'image'], ['caption', 'Didascalia']],
     timeline: [['title', 'Titolo'], ['items', 'Momenti', 'list', [['time', 'Ora', 'text', '16:00'], ['title', 'Momento'], ['text', 'Dettaglio']], 'Aggiungi momento', { time: '', title: '', text: '' }]],
     story: [['title', 'Titolo'], ['intro', 'Frase introduttiva', 'area'],
       ['items', 'Le tappe della vostra storia', 'list', [['date', 'Data', 'date'], ['title', 'Titolo della tappa', 'text', 'es. Il primo appuntamento'], ['text', 'Racconta cosa è successo', 'area'], ['image', 'Foto', 'image']], 'Aggiungi tappa', { date: '', title: '', text: '', image: '' }],
@@ -304,6 +304,8 @@
     if (kind === 'area') return L + area(p);
     if (kind === 'date') return L + `<input class="in" type="date" data-k="${p}" value="${esc(get(p) || '')}" style="max-width:220px">${!get(p) && get(p.replace(/\.date$/, '.year')) ? `<span class="hint" style="margin-left:8px">prima: ${esc(get(p.replace(/\.date$/, '.year')))}</span>` : ''}`;
     if (kind === 'image') return L + upload(p);
+    if (kind === 'drawing') { const v = get(p);
+      return L + `<div class="draw-pick">${INV.drawings.map(d => `<button type="button" data-set="${p}" data-v="${d.img}" class="${v === d.img ? 'on' : ''}" title="${esc(d.name)}"><img src="${d.thumb}" alt="" loading="lazy"><span>${esc(d.name)}</span></button>`).join('')}</div>`; }
     if (kind === 'maps') return L + `<div class="rowx">${inp(p, 'https://maps.google.com/...')}<button type="button" class="btn sm" data-action="auto-maps" data-p="${base}">Genera</button></div><p class="hint">Si genera automaticamente dall'indirizzo.</p>`;
     if (kind === 'images') {
       const arr = get(p) || [];
@@ -336,10 +338,12 @@
     return t && t !== INV.blockTypes[b.type].name ? `<small>${esc(t)}</small>` : '';
   }
 
-  function iconPicker(path, type, cur, accent) {
-    const col = accent || S.blocksStyle.iconColor || '#a8864f';
+  function iconPicker(path, type, cur, accent, colPath) {
+    const own = colPath ? get(colPath) : '';
+    const col = own || accent || S.blocksStyle.iconColor || '#a8864f';
     return `<label class="l">Icona</label><div class="icons-pick">${[0, 1, 2, 3, 4, 5].map(v => `<button type="button" class="${(+cur || 0) === v ? 'on' : ''}" data-set="${path}" data-v="${v}" title="${v ? 'Linea ' + v : 'Classica 3D'}">${INV.iconHTML(type, v, col, 'ip')}</button>`).join('')}</div>
-      <p class="hint">La prima è l'icona classica 3D; le altre sono a linea sottile e prendono il colore delle icone.</p>`;
+      <p class="hint">La prima è l'icona classica 3D; le altre sono a linea sottile e si possono colorare.</p>
+      ${colPath ? `<label class="l">Colore dell'icona</label>${(+cur || 0) ? `<div class="colors ico-cols"><button type="button" data-set="${colPath}" data-v="" class="${own ? '' : 'on'}"><i style="background:${accent || S.blocksStyle.iconColor || '#a8864f'}"></i>Come le altre</button>${INV.colors.filter(c => c.id !== '#f4ecd8').map(c => `<button type="button" data-set="${colPath}" data-v="${c.id}" class="${own === c.id ? 'on' : ''}"><i style="background:${c.id}"></i>${c.name}</button>`).join('')}${customPick(colPath, !!own && !INV.colors.some(c => c.id === own))}</div>` : `<p class="hint" style="margin-top:0">L'icona classica 3D ha i suoi colori: scegli un'icona a linea (dalla seconda in poi) per colorarla come vuoi.</p>`}` : ''}`;
   }
   function tabBlocks() {
     const bs = S.blocksStyle;
@@ -352,7 +356,7 @@
           <button type="button" class="ibtn" data-action="vis-block" data-i="${i}" title="${b.visible ? 'Nascondi' : 'Mostra'}">${b.visible ? I.eye : I.eyeOff}</button>
           <button type="button" class="ibtn del" data-action="del-block" data-i="${i}" title="Elimina">${I.trash}</button></div>
         ${open ? `<div class="blk-b">${(F[b.type] || []).map(f => field(`blocks.${i}.data`, f)).join('')}
-          ${b.type !== 'drawing' ? iconPicker(`blocks.${i}.icon`, b.type, b.icon, b.accent) : ''}
+          ${b.type !== 'drawing' ? iconPicker(`blocks.${i}.icon`, b.type, b.icon, b.accent, `blocks.${i}.iconColor`) : ''}
           <label class="l">Colore del blocco</label><div class="accents">${INV.accents.map(a => `<button type="button" class="${a ? '' : 'none'} ${b.accent === a ? 'on' : ''}" style="${a ? `background:${a}` : ''}" data-set="blocks.${i}.accent" data-v="${a}">${a ? '' : '✕'}</button>`).join('')}
             <label class="acc-pick ${b.accent && !INV.accents.includes(b.accent) ? 'on' : ''}" title="Scegli qualsiasi colore" style="background:${b.accent && !INV.accents.includes(b.accent) ? b.accent : RAINBOW}"><input type="color" data-k="blocks.${i}.accent" value="${isHex(b.accent) ? b.accent : '#a8864f'}"></label></div>
           ${b.accent && !INV.accents.includes(b.accent) ? `<input class="in hex" style="margin-top:8px;width:110px" data-hex="blocks.${i}.accent" value="${esc(b.accent)}" maxlength="7" spellcheck="false">` : ''}

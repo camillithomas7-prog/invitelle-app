@@ -394,9 +394,19 @@
       if (intro) splitLines(intro.querySelector('.txt'));
       cache = null; requestAnimationFrame(measure);
       const fin = r.querySelector('.finale.has-cheers');
-      if (fin && !r.closest('.preview') && !document.body.classList.contains('preview') && 'IntersectionObserver' in window) {
+      // il brindisi riparte ogni volta che il finale torna sullo schermo (anche nell'anteprima del pannello)
+      window.__toastIO?.disconnect();
+      if (fin && 'IntersectionObserver' in window) {
         const bg = (S.blocksStyle || {}).bg || '#fbf8f2', n = parseInt(bg.slice(1), 16), light = ((n >> 16) * .299 + (n >> 8 & 255) * .587 + (n & 255) * .114) > 150;
-        const io = new IntersectionObserver(es => { if (es[0].isIntersecting) { io.disconnect(); fin.classList.add('toast'); if (motion !== 'none') fireworks(fin, light); } }, { threshold: .55 });
+        const io = window.__toastIO = new IntersectionObserver(es => {
+          const e = es[es.length - 1];
+          if (e.isIntersecting && e.intersectionRatio >= .45 && !fin.__on) {
+            fin.__on = true;
+            fin.classList.remove('toast'); void fin.offsetWidth; fin.classList.add('toast');
+            fin.querySelector('canvas.fw')?.remove();
+            if (motion !== 'none') fireworks(fin, light);
+          } else if (!e.isIntersecting) { fin.__on = false; fin.classList.remove('toast'); }
+        }, { threshold: [0, .45] });
         io.observe(fin);
       }
       r.querySelectorAll('.paper img').forEach(img => { if (!img.complete) img.addEventListener('load', () => { cache = null; onScroll(); }, { once: true }); });

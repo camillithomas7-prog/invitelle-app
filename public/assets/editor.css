@@ -530,3 +530,13 @@ body.wide .pl-table, body.wide .ck-g, body.wide .pl-prog { max-width: 1100px; }
 .fxt-paper .pp-l.s { top: 48%; width: 50%; margin-left: -25%; }
 .fxt-paper .pp-c { top: 60%; width: 76%; height: 26%; margin-left: -38%; background: rgba(255,255,255,.6); opacity: 1; border: 1px solid rgba(0,0,0,.06); border-radius: 6px; }
 .fxt-paper .fxt-cv { z-index: 1; }
+
+/* illustrazioni pronte del blocco Disegno */
+.draw-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; margin-bottom: 6px; }
+.draw-pick button { padding: 6px 6px 8px; border: 1px solid var(--line2); border-radius: 12px; background: #fbf8f2; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: border-color .2s, box-shadow .2s, transform .2s; }
+.draw-pick button:hover { transform: translateY(-2px); }
+.draw-pick img { width: 100%; aspect-ratio: 1; object-fit: contain; mix-blend-mode: multiply; }
+.draw-pick span { font-size: 11px; line-height: 1.25; text-align: center; color: var(--mute); }
+.draw-pick button.on { border-color: var(--brand); box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 22%, transparent); }
+.draw-pick button.on span { color: var(--ink); font-weight: 600; }
+@media (max-width: 560px) { .draw-pick { grid-template-columns: repeat(3, 1fr); } }
