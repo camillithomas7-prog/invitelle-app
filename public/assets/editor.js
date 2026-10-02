@@ -147,7 +147,14 @@
         <div class="vid" style="background-image:url('${t.poster}')"><video src="${t.video}" poster="${t.poster}" muted loop playsinline preload="none"></video>
         <span class="play">${I.play}</span>${t.popular ? '<span class="pop">Popolare</span>' : ''}${S.theme === t.id ? `<span class="chk">${I.check}</span>` : ''}</div>
         <div class="meta"><b>${esc(t.name)}</b><small>${esc(t.desc)}</small></div></button>`).join('')}
-        </div>${fxSec()}${paperSec()}`;
+        </div>${bordersSec()}${fxSec()}${paperSec()}`;
+  }
+  // bordi decorativi ai lati dei blocchi
+  function bordersSec() {
+    const cur = S.blocksStyle.flowers;
+    return `<div class="sec" style="margin-top:26px"><h3>Bordi floreali</h3>
+      <p class="hint" style="margin:-6px 0 12px">Decorazioni ai lati dei blocchi, mentre gli ospiti scorrono l'invito.</p>
+      <div class="flow">${INV.flowers.map(f => `<button type="button" data-set="blocksStyle.flowers" data-v="${f.id}" class="${cur === f.id ? 'on' : ''}"><div style="${f.img ? `background-image:url('${f.img}')` : ''}">${f.img ? '' : '✕'}</div>${f.name}</button>`).join('')}</div></div>`;
   }
   // effetti dell'invito: animazioni e atmosfera sopra il video iniziale, con anteprime animate dal vivo
   function fxSec() {
@@ -368,8 +375,6 @@
         <label class="l">Colore del testo <span style="font-weight:400;color:var(--mute)">(per i blocchi)</span></label>${colorRow('blocksStyle.color')}
         <label class="l">Colore delle icone <span style="font-weight:400;color:var(--mute)">(icone a linea)</span></label>${colorRow('blocksStyle.iconColor')}
         <div class="rowx" style="margin-top:10px;gap:8px;flex-wrap:wrap"><span class="hint" style="margin:0">Stessa icona per tutti i blocchi:</span>${[0, 1, 2, 3, 4, 5].map(v => `<button type="button" class="btn sm" data-action="icons-all" data-v="${v}">${v ? 'Linea ' + v : 'Classica 3D'}</button>`).join('')}</div></div>
-      <div class="sec"><div class="box soft"><b style="font-size:13px">Bordi floreali</b><p class="hint" style="margin:2px 0 10px">Decorazioni floreali ai lati dei blocchi</p>
-        <div class="flow">${INV.flowers.map(f => `<button type="button" data-set="blocksStyle.flowers" data-v="${f.id}" class="${bs.flowers === f.id ? 'on' : ''}"><div style="${f.img ? `background-image:url('${f.img}')` : ''}">${f.img ? '' : '✕'}</div>${f.name}</button>`).join('')}</div></div></div>
       <div class="sec"><h3>Blocchi attivi</h3><p class="hint" style="margin:-6px 0 12px">Trascina per riordinare · Clicca per modificare · Occhio per nascondere</p>
         <div class="blocks" id="blocks">${list}</div>
         <div class="blk-i rsvp-i ${S.rsvp.enabled ? '' : 'hid'}">
@@ -746,6 +751,7 @@
       set(st.dataset.set, st.dataset.v); changed(true);
       if (st.dataset.set.startsWith('envelope')) post({ data: S, view: 'envelope' });
       if (st.dataset.set === 'theme' || st.dataset.set.startsWith('fx.')) post({ replay: true });
+      if (st.dataset.set === 'blocksStyle.flowers') { const b = S.blocks.find(x => x.visible && !(x.type === 'countdown' && x.data.image)); if (b) post({ view: b.id }); }
       return;
     }
     const ac = e.target.closest('[data-action]'); if (!ac) return;
