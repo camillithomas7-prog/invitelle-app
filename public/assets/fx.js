@@ -268,7 +268,7 @@
       if (intro) {
         if (!intro.atmos) intro.atmos = new Atmos(intro);
         const [m, cols] = pickMode(fx, S.theme);
-        intro.atmos.set(motion === 'none' ? 'none' : m, cols, fx.amount);
+        intro.atmos.set(m, cols, fx.amount);   // l'atmosfera è indipendente dalle animazioni (si spegne solo con "riduci movimento" del telefono)
       }
       // atmosfera dentro l'invito: livello fermo sullo schermo dietro ai blocchi (none | same | effetto)
       const paper = r.querySelector('.paper');
@@ -280,7 +280,7 @@
         if (!host.atmos || host.atmos.light !== light) { host.atmos?.destroy(); host.querySelector('canvas')?.remove(); host.atmos = new Atmos(host, { light, cls: 'atmos atmos-b' }); }
         const b = fx.body || 'none';
         const [bm, bc] = b === 'same' ? pickMode(fx, S.theme) : pickMode({ particles: b }, S.theme);
-        host.atmos.set(motion === 'none' || b === 'none' ? 'none' : bm, bc, b === 'same' ? (fx.bodyAmount || fx.amount) : fx.bodyAmount);
+        host.atmos.set(b === 'none' ? 'none' : bm, bc, b === 'same' ? (fx.bodyAmount || fx.amount) : fx.bodyAmount);
         splitLines(intro.querySelector('.txt'));
       }
       r.querySelectorAll('.car-track').forEach(t => {

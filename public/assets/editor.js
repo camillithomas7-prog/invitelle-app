@@ -152,7 +152,7 @@
     const m = S.fx.motion, p = S.fx.particles, am = S.fx.amount || 'medium';
     const theme = INV.themes.find(t => t.id === S.theme) || INV.themes[0];
     const auto = InvFx.MODES.find(x => x.id === InvFx.pickMode({ particles: 'auto' }, S.theme)[0]);
-    const motions = [['cinema', 'Cinematiche', 'Titolo scritto a mano, blocchi che entrano in sequenza, linee che si disegnano'], ['soft', 'Delicate', 'Solo dissolvenze leggere'], ['none', 'Ferme', 'Nessuna animazione']];
+    const motions = [['cinema', 'Cinematiche', 'Titolo scritto a mano, blocchi che entrano in sequenza, linee che si disegnano'], ['soft', 'Delicate', 'Solo dissolvenze leggere'], ['none', 'Ferme', 'Testi e blocchi fermi (l\'atmosfera resta)']];
     const mock = `<i class="mk-t"></i><i class="mk-a"></i><i class="mk-t2"></i><i class="mk-d"></i><i class="mk-c"></i><i class="mk-c2"></i>`;
     return `<div class="sec fx-sec" style="margin-top:26px"><h3>Effetti dell'invito</h3>
       <p class="hint" style="margin:-6px 0 14px">Come prende vita l'invito quando gli ospiti lo aprono e lo scorrono. Le anteprime sono animate dal vivo sul tuo tema.</p>
