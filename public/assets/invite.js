@@ -307,7 +307,7 @@
     try { if (!opts.preview && localStorage.getItem(sk)) scratched = true; } catch (e) {}
     if ((S.fx || {}).scratch && !scratched && window.InvFx) {
       const dt = $('.intro .date .dt', root);
-      if (dt) requestAnimationFrame(() => InvFx.scratch(dt, { label: T('scratch'), onDone: () => { scratched = true; try { if (!opts.preview) localStorage.setItem(sk, '1'); } catch (e) {} } }));
+      if (dt) InvFx.scratch(dt, { label: T('scratch'), onDone: () => { scratched = true; try { if (!opts.preview) localStorage.setItem(sk, '1'); } catch (e) {} } });
     }
   }
   const fxMotion = () => (window.InvFx && InvFx.reduce) ? 'none' : ((S.fx || {}).motion || 'cinema');
