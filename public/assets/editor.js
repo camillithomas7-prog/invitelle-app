@@ -162,8 +162,7 @@
       <div class="fx-mot">${motions.map(([v, t, d]) => `<button type="button" data-set="fx.motion" data-v="${v}" class="fxt ${m === v ? 'on' : ''}">
         <div class="fxt-pv mk mk-${v}" style="background-image:url('${theme.poster}')">${mock}${m === v ? `<span class="chk">${I.check}</span>` : ''}</div>
         <b>${t}</b><small>${d}</small></button>`).join('')}</div>
-      <h4 class="fx-h">Sorprese per gli ospiti</h4>
-      ${tog('scratch', 'Gratta e scopri la data', 'La data è coperta da una patina dorata: gli ospiti la grattano col dito e parte una pioggia di coriandoli', 'fx.scratch')}
+      <h4 class="fx-h">Sorpresa finale</h4>
       ${tog('cheers', 'Brindisi finale', 'In fondo all\'invito due calici si toccano e partono i fuochi d\'artificio', 'fx.toast')}
       <h4 class="fx-h" style="margin-top:26px">1. Atmosfera dell'apertura <small>sopra il video iniziale</small></h4>
       <div class="fx-par">${InvFx.MODES.map(x => `<button type="button" data-set="fx.particles" data-v="${x.id}" class="fxt ${p === x.id ? 'on' : ''}">
@@ -249,7 +248,8 @@
         <div class="row2"><div><label class="l">Data</label>${inp('details.date', '', 'date')}</div><div><label class="l">Data di fine <span style="font-weight:400;color:var(--mute)">(facoltativa)</span></label>${inp('details.endDate', '', 'date')}</div></div>
         <p class="hint">Per eventi di più giorni inserisci una data di fine: verrà mostrato l'intervallo.</p>
         <label class="l">Dimensione data</label><div class="range"><input type="range" min="12" max="34" data-k="details.dateSize" value="${d.dateSize}"><output>${d.dateSize}px</output></div>
-        <label class="l">Posizione della data</label><div class="seg"><button type="button" data-set="details.datePos" data-v="above" class="${d.datePos === 'above' ? 'on' : ''}">Sopra il titolo</button><button type="button" data-set="details.datePos" data-v="below" class="${d.datePos === 'below' ? 'on' : ''}">Sotto il titolo</button></div></div>
+        <label class="l">Posizione della data</label><div class="seg"><button type="button" data-set="details.datePos" data-v="above" class="${d.datePos === 'above' ? 'on' : ''}">Sopra il titolo</button><button type="button" data-set="details.datePos" data-v="below" class="${d.datePos === 'below' ? 'on' : ''}">Sotto il titolo</button></div>
+        <div style="margin-top:16px">${tog('scratch', 'Gratta e scopri la data', 'La data è coperta da una patina dorata: gli ospiti la grattano col dito e parte una pioggia di coriandoli', 'fx.scratch')}</div></div>
       <div class="sec"><h3><span class="dot"></span>Titolo di apertura</h3>${area('details.headline', 'Giulia\n&\nMarco')}
         <p class="hint">Premi Invio per andare a capo: ogni riga appare su una riga separata dell'invito.<br>Meno è meglio: lascia parlare il tema animato.</p>
         <label class="l">Font del titolo</label>${fontGrid('details.headlineFont', true)}
