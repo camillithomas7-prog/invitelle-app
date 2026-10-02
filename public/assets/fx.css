@@ -4,7 +4,7 @@
 /* ---------- ATMOSFERA ---------- */
 .atmos { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; opacity: 0; transition: opacity 2.4s ease .6s; }
 .played .atmos { opacity: 1; }
-.paper > .atmos-body { position: sticky; top: 0; height: 100vh; margin-bottom: -100vh; z-index: 0; pointer-events: none; }
+.paper > .atmos-body { position: sticky; top: 0; height: 100vh; height: 100lvh; margin-bottom: -100vh; margin-bottom: -100lvh; z-index: 0; pointer-events: none; }
 .atmos-b { opacity: 0; transition: opacity 1.6s ease; }
 .played .atmos-b { opacity: .82; }
 .burst { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 90; pointer-events: none; }
@@ -13,7 +13,8 @@
 /* il video parte un po' ingrandito e "si allontana", con un velo di luce calda che si dissolve */
 .fx-cinema .intro video { transform-origin: 50% 62%; translate: 0 calc(var(--sy, 0) * 28%); }
 .fx-cinema.played .intro video { animation: fx-dolly 6.5s cubic-bezier(.16,.7,.25,1) both; }
-@keyframes fx-dolly { from { transform: scale(1.22); filter: brightness(1.3) saturate(.8); } 45% { filter: none; } to { transform: scale(1); } }
+@media (max-width: 700px) { .fx-cinema.played .intro video { animation-duration: 4.5s; } }
+@keyframes fx-dolly { from { transform: scale(1.22); } to { transform: scale(1); } }
 .fx-cinema .intro::after { content: ''; position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: 0;
   background: radial-gradient(ellipse at 50% 42%, #fffaf0 0%, rgba(255,247,230,.92) 38%, rgba(255,240,214,.4) 70%, rgba(255,240,214,0) 100%); }
 .fx-cinema.played:not(.settled) .intro::after { animation: fx-bloom 2.2s ease-out both; }
@@ -27,15 +28,15 @@
 .fx-cinema .intro .hl > div.ink { -webkit-mask-image: linear-gradient(90deg, #000 42%, transparent 58%); mask-image: linear-gradient(90deg, #000 42%, transparent 58%);
   -webkit-mask-size: 280% 100%; mask-size: 280% 100%; -webkit-mask-position: 100% 0; mask-position: 100% 0; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
 .fx-cinema.played .intro .hl > div.ink { animation: fx-ink 1.7s cubic-bezier(.45,.05,.2,1) calc(.9s + var(--li) * .34s) both; }
-@keyframes fx-ink { from { -webkit-mask-position: 100% 0; mask-position: 100% 0; filter: blur(5px); transform: translateY(8px); }
-  to { -webkit-mask-position: 0 0; mask-position: 0 0; filter: blur(0); transform: none; } }
+@keyframes fx-ink { from { -webkit-mask-position: 100% 0; mask-position: 100% 0; transform: translateY(8px); }
+  to { -webkit-mask-position: 0 0; mask-position: 0 0; transform: none; } }
 /* la data arriva per ultima, le lettere si stringono e due filetti si allungano ai lati */
 .fx-cinema .intro .date { display: flex; align-items: center; justify-content: center; gap: 14px; }
 .fx-cinema .intro .date::before, .fx-cinema .intro .date::after { content: ''; flex: 0 100 34px; min-width: 8px; height: 1px; background: currentColor; opacity: .65; transform: scaleX(0); }
 .fx-cinema .intro .date::before { transform-origin: right; } .fx-cinema .intro .date::after { transform-origin: left; }
 .fx-cinema.played .intro .txt > .date { animation: fx-date 1.8s cubic-bezier(.2,.7,.2,1) calc(1.3s + var(--nl, 3) * .34s) both; }
 .fx-cinema.played .intro .date::before, .fx-cinema.played .intro .date::after { animation: fx-line 1.2s cubic-bezier(.6,0,.2,1) calc(2s + var(--nl, 3) * .34s) forwards; }
-@keyframes fx-date { from { opacity: 0; letter-spacing: .55em; filter: blur(4px); } to { opacity: 1; letter-spacing: .14em; filter: none; } }
+@keyframes fx-date { from { opacity: 0; transform: scale(1.25); } to { opacity: 1; transform: none; } }
 @keyframes fx-line { to { transform: scaleX(1); } }
 /* fine dell'animazione: tutto fermo (le modifiche dal pannello non la fanno ripartire) */
 .fx-cinema.settled .intro .hl > div.ink { animation: none; -webkit-mask-image: none; mask-image: none; filter: none; transform: none; }
@@ -55,12 +56,12 @@
 
 /* ---------- BLOCCHI: ogni elemento entra in sequenza ---------- */
 .fx-cinema .blk.reveal { opacity: 1; transform: none; transition: none; }
-.fx-cinema .blk > :not(.fl):not(.ph-bg) { transition: opacity 1.1s ease, transform 1.2s cubic-bezier(.2,.7,.2,1), filter 1.1s ease, clip-path 1.3s cubic-bezier(.6,0,.2,1);
+.fx-cinema .blk > :not(.fl):not(.ph-bg) { transition: opacity 1.1s ease, transform 1.2s cubic-bezier(.2,.7,.2,1), clip-path 1.3s cubic-bezier(.6,0,.2,1);
   transition-delay: calc(var(--i, 0) * 120ms + 60ms); }
-.fx-cinema .blk.reveal:not(.in) > :not(.fl):not(.ph-bg) { opacity: 0; transform: translateY(28px); filter: blur(6px); }
-.fx-cinema .blk.reveal:not(.in) > .ico { transform: scale(.35) rotate(-30deg); filter: none; }
+.fx-cinema .blk.reveal:not(.in) > :not(.fl):not(.ph-bg) { opacity: 0; transform: translateY(28px); }
+.fx-cinema .blk.reveal:not(.in) > .ico { transform: scale(.35) rotate(-30deg); }
 .fx-cinema .blk > .ico { transition: opacity .9s ease, transform 1.1s cubic-bezier(.34,1.56,.64,1); }
-.fx-cinema .blk.reveal:not(.in) > h2 { transform: translateY(45%); clip-path: inset(0 -10% 100% -10%); filter: none; }
+.fx-cinema .blk.reveal:not(.in) > h2 { transform: translateY(45%); clip-path: inset(0 -10% 100% -10%); }
 .fx-cinema .blk > h2 { clip-path: inset(-20% -10% -25% -10%); }
 /* i bordi floreali crescono dai lati */
 .fx-cinema .blk .fl { transition: transform 1.8s cubic-bezier(.2,.7,.2,1), opacity 1.6s ease; }
@@ -75,7 +76,7 @@
 .cd div { position: relative; overflow: hidden; }
 .cd b { overflow: hidden; }
 .cd b .roll { display: inline-block; animation: fx-roll .55s cubic-bezier(.2,.7,.2,1); }
-@keyframes fx-roll { from { transform: translateY(-70%); opacity: 0; filter: blur(2px); } }
+@keyframes fx-roll { from { transform: translateY(-70%); opacity: 0; } }
 .fx-cinema .cd div { transition: opacity .9s ease, transform 1s cubic-bezier(.2,.7,.2,1); }
 .fx-cinema .cd div:nth-child(2) { transition-delay: .1s; } .fx-cinema .cd div:nth-child(3) { transition-delay: .2s; } .fx-cinema .cd div:nth-child(4) { transition-delay: .3s; }
 .fx-cinema .blk.reveal:not(.in) .cd div { opacity: 0; transform: translateY(24px) scale(.92); }
@@ -170,9 +171,9 @@
 .fx-cinema .finale .ring .lf { transform: scale(0); transform-box: fill-box; transform-origin: center; transition: transform .8s cubic-bezier(.34,1.56,.64,1) 1.6s; }
 .fx-cinema .finale.in .ring circle, .fx-cinema .finale.in .ring path:not(.lf) { stroke-dashoffset: 0; }
 .fx-cinema .finale.in .ring .lf { transform: none; }
-.fx-cinema .finale .mono, .fx-cinema .finale .fin-names, .fx-cinema .finale .fin-t, .fx-cinema .finale .fin-d { opacity: 0; transform: translateY(14px); filter: blur(5px); transition: opacity 1.2s ease, transform 1.3s cubic-bezier(.2,.7,.2,1), filter 1.2s ease; }
+.fx-cinema .finale .mono, .fx-cinema .finale .fin-names, .fx-cinema .finale .fin-t, .fx-cinema .finale .fin-d { opacity: 0; transform: translateY(14px); transition: opacity 1.2s ease, transform 1.3s cubic-bezier(.2,.7,.2,1); }
 .fx-cinema .finale .mono { transition-delay: .9s; } .fx-cinema .finale .fin-names { transition-delay: 1.4s; } .fx-cinema .finale .fin-t { transition-delay: 1.8s; } .fx-cinema .finale .fin-d { transition-delay: 2.1s; }
-.fx-cinema .finale.in .mono, .fx-cinema .finale.in .fin-names, .fx-cinema .finale.in .fin-t, .fx-cinema .finale.in .fin-d { opacity: 1; transform: none; filter: none; }
+.fx-cinema .finale.in .mono, .fx-cinema .finale.in .fin-names, .fx-cinema .finale.in .fin-t, .fx-cinema .finale.in .fin-d { opacity: 1; transform: none; }
 
 /* ---------- PULSANTE MUSICA: barre che danzano ---------- */
 .snd .eq { display: flex; align-items: flex-end; gap: 2.5px; height: 16px; }

@@ -37,178 +37,205 @@
   }
 
   // ---------- PARTICELLE ----------
+  // Prestazioni (telefoni): ogni forma è disegnata UNA volta in uno "sprite" (con sfumature e ombra già cotte),
+  // poi a ogni fotogramma si fa solo drawImage. Niente gradienti né shadowBlur nel ciclo, risoluzione limitata.
+  const mobile = matchMedia('(max-width: 700px), (pointer: coarse)').matches;
+  const SPR = {};
+  function sprite(key, size, draw) {
+    if (SPR[key]) return SPR[key];
+    const c = document.createElement('canvas'); c.width = c.height = size;
+    draw(c.getContext('2d'), size / 2); return (SPR[key] = c);
+  }
+  const glowSpr = (c1, c2, core) => sprite('g' + c1 + c2 + (core || ''), 64, (x, m) => {
+    const g = x.createRadialGradient(m, m, 0, m, m, m);
+    g.addColorStop(0, `rgba(${c1},1)`); g.addColorStop(.3, `rgba(${c2},.45)`); g.addColorStop(1, `rgba(${c2},0)`);
+    x.fillStyle = g; x.fillRect(0, 0, m * 2, m * 2);
+    if (core) { x.fillStyle = `rgba(${core},.95)`; x.beginPath(); x.arc(m, m, m * .17, 0, TAU); x.fill(); x.fillStyle = 'rgba(255,250,235,.95)'; x.beginPath(); x.arc(m - 3, m - 3, m * .07, 0, TAU); x.fill(); }
+  });
+  const sparkSpr = (c) => sprite('s' + c, 64, (x, m) => {
+    x.fillStyle = `rgba(${c},1)`; x.beginPath(); x.moveTo(m, 2); x.quadraticCurveTo(m + 4, m - 4, 62, m); x.quadraticCurveTo(m + 4, m + 4, m, 62);
+    x.quadraticCurveTo(m - 4, m + 4, 2, m); x.quadraticCurveTo(m - 4, m - 4, m, 2); x.fill();
+  });
+  const shadow = x => { x.shadowColor = 'rgba(70,40,25,.3)'; x.shadowBlur = 5; x.shadowOffsetY = 2; };
+  const petalSpr = col => sprite('p' + col, 64, (x, m) => {
+    shadow(x); const r = 22, g = x.createLinearGradient(0, m - r, 0, m + r); g.addColorStop(0, '#fff'); g.addColorStop(.35, col); g.addColorStop(1, col);
+    x.fillStyle = g; x.beginPath(); x.moveTo(m, m - r); x.bezierCurveTo(m + r * .9, m - r * .6, m + r * .7, m + r * .6, m, m + r); x.bezierCurveTo(m - r * .7, m + r * .6, m - r * .9, m - r * .6, m, m - r); x.fill();
+  });
+  const heartSpr = col => sprite('h' + col, 64, (x, m) => {
+    shadow(x); const r = 24, g = x.createLinearGradient(0, m - r, 0, m + r); g.addColorStop(0, '#fff'); g.addColorStop(.4, col); g.addColorStop(1, col);
+    x.fillStyle = g; x.beginPath(); x.moveTo(m, m + r * .5);
+    x.bezierCurveTo(m - r * 1.1, m - r * .2, m - r * .45, m - r * .9, m, m - r * .3); x.bezierCurveTo(m + r * .45, m - r * .9, m + r * 1.1, m - r * .2, m, m + r * .5); x.fill();
+  });
+  const leafSpr = col => sprite('l' + col, 64, (x, m) => {
+    shadow(x); const r = 26; x.fillStyle = col;
+    x.beginPath(); x.moveTo(m, m - r); x.quadraticCurveTo(m + r * .38, m, m, m + r); x.quadraticCurveTo(m - r * .38, m, m, m - r); x.fill();
+    x.shadowColor = 'transparent'; x.strokeStyle = 'rgba(255,255,255,.45)'; x.lineWidth = 1.2; x.beginPath(); x.moveTo(m, m - r * .85); x.lineTo(m, m + r * .85); x.stroke();
+  });
+  const foilSpr = k => sprite('c' + k, 64, (x, m) => {
+    shadow(x); const l = 60 + k * 8, g = x.createLinearGradient(m - 20, m - 14, m + 20, m + 14);
+    g.addColorStop(0, `hsl(40, 70%, ${l - 22}%)`); g.addColorStop(.5, `hsl(46, 85%, ${Math.min(92, l + 10)}%)`); g.addColorStop(1, `hsl(38, 65%, ${l - 26}%)`);
+    x.fillStyle = g; x.fillRect(m - 20, m - 12, 40, 24);
+  });
+
   class Atmos {
     constructor(host, opt = {}) {
       this.host = host; this.scale = opt.scale || 1; this.minArea = opt.minArea; this.light = !!opt.light;
       this.c = document.createElement('canvas'); this.c.className = opt.cls || 'atmos';
       host.appendChild(this.c);
-      this.x = this.c.getContext('2d'); this.ps = []; this.mode = 'none'; this.on = false; this.vis = true; this.shoot = null;
+      this.x = this.c.getContext('2d'); this.ps = []; this.mode = 'none'; this.on = false; this.vis = true; this.shoot = null; this.last = 0;
       this.resize = this.resize.bind(this); this.loop = this.loop.bind(this);
-      addEventListener('resize', this.resize);
+      if ('ResizeObserver' in window) { this.ro = new ResizeObserver(() => this.resize()); this.ro.observe(host); } else addEventListener('resize', this.resize);
       if ('IntersectionObserver' in window) { this.io = new IntersectionObserver(es => { this.vis = es[0].isIntersecting; if (this.vis) this.kick(); }); this.io.observe(host); }
       this.onVis = () => this.kick(); document.addEventListener('visibilitychange', this.onVis);
     }
     set(mode, colors, amount = 'medium') {
       if (reduce) mode = 'none';
-      const key = mode + colors + amount;
+      const key = mode + colors + amount + this.light;
       if (key === this.key) return;
-      this.key = key; this.mode = mode; this.colors = colors; this.amount = AMOUNT[amount] || 1; this.c.hidden = mode === 'none';
+      this.key = key; this.mode = mode; this.colors = colors || PETALS_DEF; this.amount = AMOUNT[amount] || 1; this.c.hidden = mode === 'none';
       this.resize(); this.seed(); this.kick();
     }
     resize() {
-      const r = this.host.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
-      this.w = r.width; this.h = r.height; this.c.width = r.width * dpr; this.c.height = r.height * dpr;
-      this.x.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const r = this.host.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, mobile ? 1.5 : 2);
+      if (!r.width || !r.height) return;
+      const changed = Math.abs(r.width - (this.w || 0)) > 1 || Math.abs(r.height - (this.h || 0)) > 60;
+      this.w = r.width; this.h = r.height; this.dpr = dpr;
+      if (changed || !this.c.width) { this.c.width = Math.round(r.width * dpr); this.c.height = Math.round(r.height * dpr); }
     }
     seed() {
-      const area = Math.max(this.minArea || .35, (this.w * this.h) / (420 * 860));
-      const n = Math.round((BASE[this.mode] || 0) * this.amount * Math.min(1.4, area));
+      const area = Math.max(this.minArea || .35, ((this.w || 400) * (this.h || 800)) / (420 * 860));
+      const n = Math.round((BASE[this.mode] || 0) * this.amount * Math.min(1.4, area) * (mobile ? .75 : 1));
       this.ps = Array.from({ length: n }, () => this.make(true));
     }
     make(any) {
-      const w = this.w || 400, h = this.h || 800, m = this.mode, s = this.scale;
+      const w = this.w || 400, h = this.h || 800, m = this.mode, s = this.scale, pick = a => a[(R() * a.length) | 0];
       const p = { x: R() * w, y: any ? R() * h : 0, t: R() * TAU };
-      if (m === 'oro') Object.assign(p, { y: any ? p.y : h + 10, r: (.6 + R() * 2.2) * s, vy: -(.12 + R() * .35), vx: (R() - .5) * .12, tw: .02 + R() * .04, glint: R() < .3 });
-      if (m === 'petali') Object.assign(p, { y: any ? p.y : -20, r: (6 + R() * 7) * s, vy: .45 + R() * .7, vx: .2 + R() * .5, rot: R() * TAU, vr: (R() - .5) * .04, flip: R() * TAU, col: this.colors[(R() * this.colors.length) | 0] });
+      if (m === 'oro') Object.assign(p, { y: any ? p.y : h + 10, r: (.8 + R() * 2.2) * s, vy: -(.12 + R() * .35), vx: (R() - .5) * .12, tw: .02 + R() * .04, glint: R() < .3 });
+      if (m === 'petali') Object.assign(p, { y: any ? p.y : -20, r: (6 + R() * 7) * s, vy: .45 + R() * .7, vx: .2 + R() * .5, rot: R() * TAU, vr: (R() - .5) * .04, flip: R() * TAU, spr: petalSpr(pick(this.colors)) });
       if (m === 'lucciole') Object.assign(p, { r: (1.2 + R() * 1.8) * s, vx: (R() - .5) * .3, vy: (R() - .5) * .3, tw: .015 + R() * .03 });
       if (m === 'neve') Object.assign(p, { y: any ? p.y : -6, r: (.8 + R() * 2.6) * s, vy: .35 + R() * .8, vx: (R() - .5) * .3 });
-      if (m === 'cuori') Object.assign(p, { y: any ? p.y : h + 20, r: (7 + R() * 8) * s, vy: -(.3 + R() * .45), sw: 12 + R() * 18, col: ['#e98b9a', '#d9667a', '#f2b3bd', '#d7ad5c'][(R() * 4) | 0], a: .7 + R() * .3 });
+      if (m === 'cuori') Object.assign(p, { y: any ? p.y : h + 20, r: (7 + R() * 8) * s, vy: -(.3 + R() * .45), sw: 12 + R() * 18, spr: heartSpr(pick(['#e98b9a', '#d9667a', '#f2b3bd', '#d7ad5c'])), a: .7 + R() * .3 });
       if (m === 'stelle') Object.assign(p, { y: R() * h * .75, r: (.5 + R() * 1.6) * s, tw: .5 + R() * 2.2, big: R() < .12 });
-      if (m === 'foglie') Object.assign(p, { y: any ? p.y : -20, r: (10 + R() * 8) * s, vy: .4 + R() * .55, vx: .15 + R() * .45, rot: R() * TAU, vr: (R() - .5) * .05, flip: R() * TAU, col: ['#7d8a52', '#97a46a', '#5f6e3c', '#b4b98a'][(R() * 4) | 0] });
-      if (m === 'coriandoli') Object.assign(p, { y: any ? p.y : -12, r: (4 + R() * 4.5) * s, vy: .5 + R() * .8, vx: (R() - .5) * .4, rot: R() * TAU, vr: (R() - .5) * .08, flip: R() * TAU, vf: .05 + R() * .08, hue: R() });
+      if (m === 'foglie') Object.assign(p, { y: any ? p.y : -20, r: (10 + R() * 8) * s, vy: .4 + R() * .55, vx: .15 + R() * .45, rot: R() * TAU, vr: (R() - .5) * .05, flip: R() * TAU, spr: leafSpr(pick(['#7d8a52', '#97a46a', '#5f6e3c', '#b4b98a'])) });
+      if (m === 'coriandoli') Object.assign(p, { y: any ? p.y : -12, r: (4 + R() * 4.5) * s, vy: .5 + R() * .8, vx: (R() - .5) * .4, rot: R() * TAU, vr: (R() - .5) * .08, flip: R() * TAU, vf: .05 + R() * .08, spr: foilSpr((R() * 4) | 0) });
       return p;
     }
     kick() { if (!this.on && this.mode !== 'none' && this.vis && !document.hidden) { this.on = true; requestAnimationFrame(this.loop); } }
-    destroy() { this.on = false; this.mode = 'none'; removeEventListener('resize', this.resize); document.removeEventListener('visibilitychange', this.onVis); this.io?.disconnect(); }
-    loop() {
+    destroy() { this.on = false; this.mode = 'none'; this.ro?.disconnect(); removeEventListener('resize', this.resize); document.removeEventListener('visibilitychange', this.onVis); this.io?.disconnect(); }
+    loop(now) {
       if (!this.c.isConnected) { this.destroy(); return; }
       if (this.mode === 'none' || !this.vis || document.hidden) { this.on = false; return; }
-      const x = this.x, w = this.w, h = this.h;
-      x.clearRect(0, 0, w, h);
-      if (this.mode === 'stelle') this.shooting(x, w, h);
-      for (let i = 0; i < this.ps.length; i++) {
-        const p = this.ps[i]; p.t += .016;
-        const out = this[this.mode](x, p, w, h);
-        if (out) this.ps[i] = this.make(false);
-      }
       requestAnimationFrame(this.loop);
+      // sul telefono 30 fotogrammi al secondo bastano e dimezzano il lavoro
+      if (mobile && now && now - this.last < 30) return;
+      const k = this.last && now ? Math.min(3, (now - this.last) / 16.7) : 1; this.last = now || 0;
+      const x = this.x, w = this.w, h = this.h, d = this.dpr || 1;
+      x.setTransform(d, 0, 0, d, 0, 0); x.globalAlpha = 1; x.clearRect(0, 0, w, h);
+      if (this.mode === 'stelle') this.shooting(x, w, h, k);
+      for (let i = 0; i < this.ps.length; i++) {
+        const p = this.ps[i]; p.t += .016 * k;
+        if (this[this.mode](x, p, w, h, k, d)) this.ps[i] = this.make(false);
+      }
+      x.globalAlpha = 1;
     }
-    soft(x) { x.shadowColor = 'rgba(70,40,25,.28)'; x.shadowBlur = 4 * this.scale; x.shadowOffsetY = 1.2 * this.scale; }
-    glow(x, px, py, r, a, c1, c2) {
-      const g = x.createRadialGradient(px, py, 0, px, py, r);
-      g.addColorStop(0, `rgba(${c1},${a})`); g.addColorStop(.35, `rgba(${c2},${a * .4})`); g.addColorStop(1, `rgba(${c2},0)`);
-      x.fillStyle = g; x.beginPath(); x.arc(px, py, r, 0, TAU); x.fill();
+    dot(x, spr, px, py, r, a) { x.globalAlpha = a; x.drawImage(spr, px - r, py - r, r * 2, r * 2); }
+    // forma ruotata e schiacciata (petali, foglie, coriandoli): trasformazione diretta, niente save/restore
+    shape(x, d, spr, px, py, r, rot, sx, sy, a) {
+      const c = Math.cos(rot), s = Math.sin(rot);
+      x.setTransform(d * c * sx, d * s * sx, -d * s * sy, d * c * sy, d * px, d * py);
+      x.globalAlpha = a; x.drawImage(spr, -r, -r, r * 2, r * 2);
+      x.setTransform(d, 0, 0, d, 0, 0);
     }
-    sparkle(x, px, py, r, a, col = '255,246,220') {
-      x.save(); x.translate(px, py); x.fillStyle = `rgba(${col},${a})`;
-      x.beginPath(); x.moveTo(0, -r); x.quadraticCurveTo(r * .12, -r * .12, r, 0); x.quadraticCurveTo(r * .12, r * .12, 0, r);
-      x.quadraticCurveTo(-r * .12, r * .12, -r, 0); x.quadraticCurveTo(-r * .12, -r * .12, 0, -r); x.fill(); x.restore();
-    }
-    oro(x, p, w, h) {
-      p.x += p.vx + Math.sin(p.t * .7) * .15; p.y += p.vy;
+    oro(x, p, w, h, k) {
+      p.x += (p.vx + Math.sin(p.t * .7) * .15) * k; p.y += p.vy * k;
       const a = .45 + Math.sin(p.t * p.tw * 60) * .4;
-      this.glow(x, p.x, p.y, p.r * 4.5, a * .8, '255,226,160', '214,168,80');
-      x.fillStyle = `rgba(196,150,62,${a * .9})`; x.beginPath(); x.arc(p.x, p.y, p.r * .75, 0, TAU); x.fill();
-      x.fillStyle = `rgba(255,250,235,${a})`; x.beginPath(); x.arc(p.x - p.r * .2, p.y - p.r * .2, p.r * .35, 0, TAU); x.fill();
-      if (p.glint && a > .5) this.sparkle(x, p.x, p.y, p.r * 5 * (a - .3), a, '255,240,200');
+      this.dot(x, glowSpr('255,226,160', '214,168,80', '196,150,62'), p.x, p.y, p.r * 4.5, Math.max(0, a));
+      if (p.glint && a > .5) this.dot(x, sparkSpr('255,240,200'), p.x, p.y, p.r * 5 * (a - .3), a);
       return p.y < -20;
     }
-    petali(x, p, w, h) {
-      p.x += p.vx + Math.sin(p.t) * .6; p.y += p.vy; p.rot += p.vr; p.flip += .03;
-      x.save(); x.translate(p.x, p.y); x.rotate(p.rot); x.scale(1, Math.max(.25, Math.abs(Math.cos(p.flip))));
-      const g = x.createLinearGradient(0, -p.r, 0, p.r); g.addColorStop(0, '#ffffff'); g.addColorStop(.35, p.col); g.addColorStop(1, p.col);
-      x.globalAlpha = .95; x.fillStyle = g; this.soft(x);
-      x.beginPath(); x.moveTo(0, -p.r); x.bezierCurveTo(p.r * .9, -p.r * .6, p.r * .7, p.r * .6, 0, p.r); x.bezierCurveTo(-p.r * .7, p.r * .6, -p.r * .9, -p.r * .6, 0, -p.r); x.fill();
-      x.restore();
+    petali(x, p, w, h, k, d) {
+      p.x += (p.vx + Math.sin(p.t) * .6) * k; p.y += p.vy * k; p.rot += p.vr * k; p.flip += .03 * k;
+      this.shape(x, d, p.spr, p.x, p.y, p.r * 1.45, p.rot, 1, Math.max(.25, Math.abs(Math.cos(p.flip))), .95);
       return p.y > h + 20 || p.x > w + 20;
     }
-    lucciole(x, p, w, h) {
-      p.vx += (R() - .5) * .04; p.vy += (R() - .5) * .04; p.vx *= .98; p.vy *= .98; p.x += p.vx; p.y += p.vy;
+    lucciole(x, p, w, h, k) {
+      p.vx += (R() - .5) * .04; p.vy += (R() - .5) * .04; p.vx *= .98; p.vy *= .98; p.x += p.vx * k; p.y += p.vy * k;
       if (p.x < -10) p.x = w + 10; if (p.x > w + 10) p.x = -10; if (p.y < -10) p.y = h + 10; if (p.y > h + 10) p.y = -10;
       const a = Math.max(0, Math.sin(p.t * p.tw * 60)) * .9;
-      this.glow(x, p.x, p.y, p.r * 6, a, this.light ? '226,176,74' : '255,240,170', this.light ? '214,160,60' : '255,214,110');
-      if (this.light) { x.fillStyle = `rgba(190,138,40,${a})`; x.beginPath(); x.arc(p.x, p.y, p.r * .7, 0, TAU); x.fill(); }
+      if (a > .02) this.dot(x, this.light ? glowSpr('226,176,74', '214,160,60', '190,138,40') : glowSpr('255,240,170', '255,214,110'), p.x, p.y, p.r * 6, a);
     }
-    neve(x, p, w, h) {
-      p.x += p.vx + Math.sin(p.t * .8 + p.r) * .35; p.y += p.vy;
-      if (this.light) { this.glow(x, p.x, p.y, p.r * 2.2, .55 + p.r / 10, '150,170,198', '190,205,225'); x.fillStyle = 'rgba(255,255,255,.9)'; x.beginPath(); x.arc(p.x, p.y, p.r * .6, 0, TAU); x.fill(); }
-      else this.glow(x, p.x, p.y, p.r * 1.8, .55 + p.r / 8, '255,255,255', '255,255,255');
+    neve(x, p, w, h, k) {
+      p.x += (p.vx + Math.sin(p.t * .8 + p.r) * .35) * k; p.y += p.vy * k;
+      if (this.light) this.dot(x, glowSpr('150,170,198', '190,205,225', '255,255,255'), p.x, p.y, p.r * 2.4, .7 + p.r / 10);
+      else this.dot(x, glowSpr('255,255,255', '255,255,255'), p.x, p.y, p.r * 1.8, .55 + p.r / 8);
       return p.y > h + 10;
     }
-    cuori(x, p, w, h) {
-      p.y += p.vy; const px = p.x + Math.sin(p.t * .9) * p.sw * .3;
+    cuori(x, p, w, h, k, d) {
+      p.y += p.vy * k; const px = p.x + Math.sin(p.t * .9) * p.sw * .3;
       const fade = Math.min(1, (h - p.y) / 80, p.y / 120);
-      x.save(); x.translate(px, p.y); x.rotate(Math.sin(p.t * .9) * .25); x.globalAlpha = Math.max(0, p.a * fade); this.soft(x);
-      const hg = x.createLinearGradient(0, -p.r, 0, p.r); hg.addColorStop(0, '#fff'); hg.addColorStop(.4, p.col); hg.addColorStop(1, p.col); x.fillStyle = hg;
-      const r = p.r; x.beginPath(); x.moveTo(0, r * .35);
-      x.bezierCurveTo(-r * 1.1, -r * .35, -r * .45, -r * 1.05, 0, -r * .45); x.bezierCurveTo(r * .45, -r * 1.05, r * 1.1, -r * .35, 0, r * .35); x.fill();
-      x.restore();
+      if (fade > 0) this.shape(x, d, p.spr, px, p.y, p.r * 1.35, Math.sin(p.t * .9) * .25, 1, 1, p.a * fade);
       return p.y < -20;
     }
-    stelle(x, p, w, h) {
+    stelle(x, p) {
       const a = .25 + (Math.sin(p.t * p.tw) * .5 + .5) * .75;
       const c = this.light ? '196,152,64' : '255,255,255';
-      this.glow(x, p.x, p.y, p.r * 3, a * .9, c, this.light ? '214,180,110' : '220,230,255');
-      if (p.big || this.light) this.sparkle(x, p.x, p.y, p.r * (p.big ? 5 : 3) * a, a * .9, c);
+      this.dot(x, glowSpr(c, this.light ? '214,180,110' : '220,230,255'), p.x, p.y, p.r * 3, a * .9);
+      if (p.big || this.light) this.dot(x, sparkSpr(c), p.x, p.y, p.r * (p.big ? 5 : 3) * a, a * .9);
     }
-    shooting(x, w, h) {
-      if (!this.shoot && R() < .006) this.shoot = { x: w * (.3 + R() * .7), y: R() * h * .35, v: 7 + R() * 5, life: 0 };
+    shooting(x, w, h, k) {
+      if (!this.shoot && R() < .006 * k) this.shoot = { x: w * (.3 + R() * .7), y: R() * h * .35, v: 7 + R() * 5, life: 0 };
       const s = this.shoot; if (!s) return;
-      s.life += 1; s.x -= s.v; s.y += s.v * .45;
+      s.life += k; s.x -= s.v * k; s.y += s.v * .45 * k;
       const a = Math.max(0, 1 - s.life / 45);
-      const g = x.createLinearGradient(s.x, s.y, s.x + 70, s.y - 32); g.addColorStop(0, `rgba(255,255,255,${a})`); g.addColorStop(1, 'rgba(255,255,255,0)');
-      x.strokeStyle = this.light ? `rgba(196,152,64,${a})` : g; x.lineWidth = 1.6 * this.scale; x.beginPath(); x.moveTo(s.x, s.y); x.lineTo(s.x + 70, s.y - 32); x.stroke();
+      x.globalAlpha = a; x.strokeStyle = this.light ? 'rgb(196,152,64)' : '#fff'; x.lineWidth = 1.6 * this.scale; x.lineCap = 'round';
+      x.beginPath(); x.moveTo(s.x, s.y); x.lineTo(s.x + 70, s.y - 32); x.stroke();
+      this.dot(x, sparkSpr(this.light ? '196,152,64' : '255,255,255'), s.x, s.y, 6 * this.scale, a);
       if (a <= 0) this.shoot = null;
     }
-    foglie(x, p, w, h) {
-      p.x += p.vx + Math.sin(p.t * .8) * .7; p.y += p.vy; p.rot += p.vr; p.flip += .025;
-      x.save(); x.translate(p.x, p.y); x.rotate(p.rot); x.scale(Math.max(.3, Math.abs(Math.cos(p.flip))), 1);
-      x.globalAlpha = .92; x.fillStyle = p.col; this.soft(x); const r = p.r;
-      x.beginPath(); x.moveTo(0, -r); x.quadraticCurveTo(r * .38, 0, 0, r); x.quadraticCurveTo(-r * .38, 0, 0, -r); x.fill();
-      x.shadowColor = 'transparent'; x.strokeStyle = 'rgba(255,255,255,.4)'; x.lineWidth = .7; x.beginPath(); x.moveTo(0, -r * .85); x.lineTo(0, r * .85); x.stroke();
-      x.restore();
+    foglie(x, p, w, h, k, d) {
+      p.x += (p.vx + Math.sin(p.t * .8) * .7) * k; p.y += p.vy * k; p.rot += p.vr * k; p.flip += .025 * k;
+      this.shape(x, d, p.spr, p.x, p.y, p.r * 1.25, p.rot, Math.max(.3, Math.abs(Math.cos(p.flip))), 1, .92);
       return p.y > h + 20 || p.x > w + 20;
     }
-    coriandoli(x, p, w, h) {
-      p.x += p.vx + Math.sin(p.t) * .4; p.y += p.vy; p.rot += p.vr; p.flip += p.vf;
-      const f = Math.cos(p.flip), l = 62 + Math.abs(f) * 22;
-      x.save(); x.translate(p.x, p.y); x.rotate(p.rot); x.scale(1, Math.max(.12, Math.abs(f)));
-      const cg = x.createLinearGradient(-p.r, -p.r, p.r, p.r);
-      cg.addColorStop(0, `hsl(${40 + p.hue * 6}, 70%, ${l - 22}%)`); cg.addColorStop(.5, `hsl(45, 85%, ${Math.min(92, l + 8)}%)`); cg.addColorStop(1, `hsl(${38 + p.hue * 6}, 65%, ${l - 26}%)`);
-      x.fillStyle = cg; x.globalAlpha = .95; this.soft(x);
-      x.fillRect(-p.r, -p.r * .6, p.r * 2, p.r * 1.2); x.restore();
+    coriandoli(x, p, w, h, k, d) {
+      p.x += (p.vx + Math.sin(p.t) * .4) * k; p.y += p.vy * k; p.rot += p.vr * k; p.flip += p.vf * k;
+      this.shape(x, d, p.spr, p.x, p.y, p.r * 1.6, p.rot, 1, Math.max(.12, Math.abs(Math.cos(p.flip))), .95);
       return p.y > h + 12;
     }
   }
 
   // ---------- SCORRIMENTO: parallasse + linee che si disegnano ----------
-  let root = null, motion = 'cinema', ticking = false;
+  // gli elementi e le soglie si calcolano una volta (apply/resize); a ogni fotogramma prima si legge, poi si scrive
+  let root = null, motion = 'cinema', ticking = false, cache = null;
+  function measure() {
+    if (!root) return;
+    cache = {
+      intro: root.querySelector('.intro'),
+      par: [...root.querySelectorAll('[data-par]')],
+      draw: [...root.querySelectorAll('[data-draw]')].map(el => ({ el, its: [...el.querySelectorAll('[data-lit]')].map(it => ({ it, t: (it.offsetTop + 14) / (el.offsetHeight || 1), on: it.classList.contains('lit') })) })),
+    };
+  }
   function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(frame); } }
   function frame() {
     ticking = false;
     if (!root || motion !== 'cinema') return;
+    if (!cache) measure();
     const vh = innerHeight, y = scrollY;
-    const intro = root.querySelector('.intro');
-    if (intro) {
-      const k = Math.min(1, y / (intro.offsetHeight || vh));
-      intro.style.setProperty('--sy', k.toFixed(4));
-    }
-    // foto che scorrono più lente della pagina
-    root.querySelectorAll('[data-par]').forEach(el => {
-      const r = el.parentElement.getBoundingClientRect();
-      if (r.bottom < -100 || r.top > vh + 100) return;
-      const c = (r.top + r.height / 2 - vh / 2) / vh;
-      el.style.translate = `0 ${(c * -14).toFixed(2)}%`;
+    // letture
+    const ih = cache.intro ? (cache.intro.offsetHeight || vh) : vh;
+    const pr = cache.par.map(el => el.parentElement.getBoundingClientRect());
+    const dr = cache.draw.map(d => d.el.getBoundingClientRect());
+    // scritture
+    if (cache.intro && y < ih * 1.2) cache.intro.style.setProperty('--sy', Math.min(1, y / ih).toFixed(3));
+    cache.par.forEach((el, i) => {
+      const r = pr[i]; if (r.bottom < -100 || r.top > vh + 100) return;
+      el.style.translate = `0 ${((r.top + r.height / 2 - vh / 2) / vh * -14).toFixed(2)}%`;
     });
-    // linee del programma e della storia che crescono mentre si scorre
-    root.querySelectorAll('[data-draw]').forEach(el => {
-      const r = el.getBoundingClientRect();
+    cache.draw.forEach((d, i) => {
+      const r = dr[i]; if (r.bottom < -vh || r.top > vh * 2) return;
       const p = Math.max(0, Math.min(1, (vh * .72 - r.top) / (r.height || 1)));
-      el.style.setProperty('--p', p.toFixed(4));
-      el.querySelectorAll('[data-lit]').forEach(it => {
-        const t = (it.offsetTop + 14) / (el.offsetHeight || 1);
-        it.classList.toggle('lit', p >= t);
-      });
+      d.el.style.setProperty('--p', p.toFixed(3));
+      d.its.forEach(o => { const on = p >= o.t; if (on !== o.on) { o.on = on; o.it.classList.toggle('lit', on); } });
     });
   }
 
@@ -230,7 +257,7 @@
     const r = fromEl?.getBoundingClientRect() || { left: W / 2, top: H / 2, width: 0, height: 0 };
     const ox = r.left + r.width / 2, oy = r.top + r.height / 2;
     const cols = colors || ['#d9b779', '#f3dfb4', '#ffffff', '#e8b7b9', '#b88f4f'];
-    const ps = Array.from({ length: 140 }, () => {
+    const ps = Array.from({ length: mobile ? 90 : 140 }, () => {
       const a = -Math.PI / 2 + (Math.random() - .5) * 2.2, v = 6 + Math.random() * 11;
       return { x: ox, y: oy, vx: Math.cos(a) * v, vy: Math.sin(a) * v, r: 3 + Math.random() * 5, rot: Math.random() * 6, vr: (Math.random() - .5) * .3, f: Math.random() * 6, col: cols[(Math.random() * cols.length) | 0], shape: Math.random() < .5 };
     });
@@ -281,17 +308,19 @@
         const b = fx.body || 'none';
         const [bm, bc] = b === 'same' ? pickMode(fx, S.theme) : pickMode({ particles: b }, S.theme);
         host.atmos.set(b === 'none' ? 'none' : bm, bc, b === 'same' ? (fx.bodyAmount || fx.amount) : fx.bodyAmount);
-        splitLines(intro.querySelector('.txt'));
       }
+      if (intro) splitLines(intro.querySelector('.txt'));
+      cache = null; requestAnimationFrame(measure);
+      r.querySelectorAll('.paper img').forEach(img => { if (!img.complete) img.addEventListener('load', () => { cache = null; onScroll(); }, { once: true }); });
       r.querySelectorAll('.car-track').forEach(t => {
         coverflow(t);
         if (!t.fxBound) { t.fxBound = 1; t.addEventListener('scroll', () => requestAnimationFrame(() => coverflow(t)), { passive: true }); }
       });
-      if (!window.__fxScroll) { window.__fxScroll = 1; addEventListener('scroll', onScroll, { passive: true }); addEventListener('resize', onScroll); }
+      if (!window.__fxScroll) { window.__fxScroll = 1; addEventListener('scroll', onScroll, { passive: true }); addEventListener('resize', () => { cache = null; onScroll(); }); addEventListener('load', () => { cache = null; onScroll(); }); }
       onScroll();
     },
     burst,
     Atmos, MODES, pickMode,
-    update: frame,
+    update: () => { cache = null; frame(); },
   };
 })();
