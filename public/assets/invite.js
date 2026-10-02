@@ -2,7 +2,7 @@
 (function () {
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const $ = (s, r = document) => r.querySelector(s);
-  const ICON_SND_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
+  const ICON_SND_ON = '<span class="eq"><i></i><i></i><i></i><i></i></span>';
   const ICON_SND_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>';
   const ICON_PIN = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>';
   const ICON_PLANE = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>';
@@ -68,6 +68,24 @@
     return d.datePos === 'above' ? dt + hl : hl + dt;
   }
 
+  // ---------- ORNAMENTI ----------
+  const ORN = `<div class="orn reveal" aria-hidden="true"><svg viewBox="0 0 240 24"><path pathLength="1" d="M8 12H92"/><path pathLength="1" d="M92 12c8 0 12-7 19-7 5 0 6 5 2 6"/><path pathLength="1" d="M92 12c8 0 12 7 19 7 5 0 6-5 2-6"/>
+    <path pathLength="1" d="M232 12H148"/><path pathLength="1" d="M148 12c-8 0-12-7-19-7-5 0-6 5-2 6"/><path pathLength="1" d="M148 12c-8 0-12 7-19 7-5 0-6-5-2-6"/><path class="dm" d="M120 6l5 6-5 6-5-6z"/></svg></div>`;
+  // nomi degli sposi ricavati dal titolo ("Giulia\n&\nMarco\n\nci sposiamo" -> Giulia & Marco)
+  function coupleNames() {
+    const parts = (S.details.headline || '').split(/\n|&| e | and | y | et | und /i).map(x => x.trim()).filter(x => /^\p{Lu}[\p{L}'’-]+$/u.test(x));
+    return parts.length >= 2 ? [parts[0], parts[1]] : null;
+  }
+  function finaleHTML() {
+    const n = coupleNames();
+    const ini = n ? `${n[0][0]} & ${n[1][0]}` : (S.envelope.initials || '');
+    const leaf = (x, y, r) => `<path class="lf" transform="rotate(${r} ${x} ${y})" d="M${x} ${y}c3-4 8-4 10 0-3 4-8 4-10 0z"/>`;
+    return `<section class="finale reveal" data-block="finale"><div class="ring"><svg viewBox="0 0 148 148">
+      <circle pathLength="1" cx="74" cy="74" r="66" transform="rotate(-90 74 74)"/><circle class="c2" pathLength="1" cx="74" cy="74" r="60" transform="rotate(90 74 74)"/>
+      ${leaf(64, 140, 0)}${leaf(74, 140, 180)}${leaf(64, 8, 0)}${leaf(74, 8, 180)}</svg><div class="mono">${esc(ini)}</div></div>
+      ${n ? `<div class="fin-names">${esc(n[0])} &amp; ${esc(n[1])}</div>` : ''}<p class="fin-t">${esc(T('seeYou'))}</p>${S.details.date ? `<div class="fin-d">${esc(dateText())}</div>` : ''}</section>`;
+  }
+
   // ---------- BLOCCHI ----------
   const blockRender = {
     countdown: b => `<h2>${esc(b.data.title)}</h2><p class="sub">${esc(b.data.subtitle)}</p>
@@ -84,16 +102,16 @@
     },
     destination: b => `<h2>${esc(b.data.title)}</h2><p class="sub">${esc(b.data.place)}</p>${b.data.image ? `<img src="${esc(b.data.image)}" style="border-radius:10px;margin:0 auto 16px;max-height:300px;object-fit:cover;width:100%" alt="">` : ''}<p>${esc(b.data.text)}</p>${b.data.tips ? `<p style="font-size:16px;opacity:.75">${esc(b.data.tips)}</p>` : ''}`,
     drawing: b => b.data.image ? `<div class="draw"><img src="${esc(b.data.image)}" alt="">${b.data.caption ? `<p style="margin-top:12px">${esc(b.data.caption)}</p>` : ''}</div>` : `<p style="opacity:.4">Carica un disegno dal pannello</p>`,
-    timeline: b => `<h2>${esc(b.data.title)}</h2><div class="tl">${(b.data.items || []).map(i => `<div class="it"><div class="t">${esc(i.time)}</div><div><div class="n">${esc(i.title)}</div>${i.text ? `<div class="d">${esc(i.text)}</div>` : ''}</div></div>`).join('')}</div>`,
+    timeline: b => `<h2>${esc(b.data.title)}</h2><div class="tl" data-draw>${(b.data.items || []).map(i => `<div class="it" data-lit><div class="t">${esc(i.time)}</div><div><div class="n">${esc(i.title)}</div>${i.text ? `<div class="d">${esc(i.text)}</div>` : ''}</div></div>`).join('')}</div>`,
     story: b => {
       const d = b.data, key = x => x.date || x.year || '';
       const items = (d.items || []).filter(x => x.title || x.text || x.image || key(x)).slice().sort((a, c) => key(a).localeCompare(key(c)));
       const when = x => { const v = key(x); return /^\d{4}-\d{2}-\d{2}$/.test(v) ? fmtDate(v) : v; };
-      const step = (x, last) => `<div class="st-it ${last ? 'final' : ''}"><span class="st-dot"></span>
+      const step = (x, last) => `<div class="st-it ${last ? 'final' : ''}" data-lit><span class="st-dot"></span>
         ${when(x) ? `<div class="yr">${esc(when(x))}</div>` : ''}<p class="st-t">${esc(x.title)}</p>
         ${x.image ? `<img src="${esc(x.image)}" alt="" loading="lazy">` : ''}${x.text ? `<p class="st-x">${esc(x.text)}</p>` : ''}</div>`;
       const wed = d.showWedding !== false && S.details.date ? step({ date: S.details.date, title: d.weddingTitle || 'Il grande giorno', text: d.weddingText || '' }, true) : '';
-      return `<h2>${esc(d.title)}</h2>${d.intro ? `<p style="font-style:italic;opacity:.8">${esc(d.intro)}</p>` : ''}<div class="story">${items.map(x => step(x)).join('')}${wed}</div>`;
+      return `<h2>${esc(d.title)}</h2>${d.intro ? `<p style="font-style:italic;opacity:.8">${esc(d.intro)}</p>` : ''}<div class="story" data-draw>${items.map(x => step(x)).join('')}${wed}</div>`;
     },
     gallery: b => {
       const imgs = b.data.images || [];
@@ -128,7 +146,7 @@
     const photo = b.type === 'countdown' && b.data.image;
     if (photo) {
       const dk = b.data.darken ? (b.data.darkness ?? 45) / 100 : 0;
-      return `<section class="blk reveal photo ${b.data.darken ? 'dark' : ''} ${acc ? 'acc' : ''}" data-block="${b.id}" style="${acc ? `--accent:${acc};` : ''}--dk:${dk}"><div class="ph-bg ${b.data.bw ? 'bw' : ''}" style="background-image:url('${esc(b.data.image)}');background-position:${b.data.posX ?? 50}% ${b.data.posY ?? 50}%;transform:scale(${(b.data.zoom ?? 100) / 100});transform-origin:${b.data.posX ?? 50}% ${b.data.posY ?? 50}%"></div>${icon}${blockRender[b.type](b)}</section>`;
+      return `<section class="blk reveal photo ${b.data.darken ? 'dark' : ''} ${acc ? 'acc' : ''}" data-block="${b.id}" style="${acc ? `--accent:${acc};` : ''}--dk:${dk}"><div class="ph-bg ${b.data.bw ? 'bw' : ''}" data-par style="background-image:url('${esc(b.data.image)}');background-position:${b.data.posX ?? 50}% ${b.data.posY ?? 50}%;transform:scale(${(b.data.zoom ?? 100) / 100});transform-origin:${b.data.posX ?? 50}% ${b.data.posY ?? 50}%"></div>${icon}${blockRender[b.type](b)}</section>`;
     }
     return `<section class="blk reveal ${acc ? 'tinted' : ''}" data-block="${b.id}" ${style}><i class="fl fl-l"></i><i class="fl fl-r"></i>${icon}${blockRender[b.type](b)}</section>`;
   }
@@ -215,7 +233,8 @@
         const res = await fetch('/api?a=rsvp.submit', { method: 'POST', body: JSON.stringify(body) }).then(r => r.json()).catch(() => ({ error: 'Errore di rete' }));
         if (res.error) { err.textContent = res.error; btn.disabled = false; btn.textContent = T('send'); return; }
       }
-      $('#rsvp-box', root).innerHTML = `<div class="thanks">${esc(yes ? T('thanksYes') : T('thanksNo'))}</div>`;
+      $('#rsvp-box', root).innerHTML = `<div class="thanks"><svg viewBox="0 0 52 52"><circle pathLength="1" cx="26" cy="26" r="24"/><path pathLength="1" d="M15 27l7 7 15-15"/></svg><p>${esc(yes ? T('thanksYes') : T('thanksNo'))}</p></div>`;
+      if (yes && window.InvFx && fxMotion() !== 'none') InvFx.burst($('#rsvp-box', root));
     });
   }
 
@@ -262,13 +281,22 @@
     const fl = INV.flowers.find(f => f.id === bs.flowers);
     root.classList.toggle('has-flowers', !!fl?.img);
     root.style.setProperty('--flw', fl?.img ? `url('${fl.img}')` : 'none');
-    paper.innerHTML = S.blocks.filter(b => b.visible).map(blockHTML).join('') + rsvpHTML()
+    const vis = S.blocks.filter(b => b.visible && blockRender[b.type]);
+    const parts = vis.map(blockHTML);
+    if (S.rsvp.enabled) { parts.push(rsvpHTML()); vis.push({ type: 'rsvp', data: {} }); }
+    const isPhoto = b => b && b.type === 'countdown' && b.data.image;
+    // ornamento tra un blocco e l'altro (non accanto alle foto a tutta larghezza)
+    paper.innerHTML = parts.map((h, i) => (i && !isPhoto(vis[i]) && !isPhoto(vis[i - 1]) ? ORN : '') + h).join('')
+      + (fxMotion() === 'none' && !S.details.date ? '' : finaleHTML())
       + `<div class="foot">${T('madeWith')}</div>`;
+    paper.querySelectorAll('.blk').forEach(b => [...b.children].filter(c => !c.classList.contains('fl') && !c.classList.contains('ph-bg')).forEach((c, k) => c.style.setProperty('--i', k)));
     bindRsvp(root);
     bindCarousels(root);
     tickCountdown(root);
     observeReveal(root);
+    if (window.InvFx) InvFx.apply(root, S);
   }
+  const fxMotion = () => (window.InvFx && InvFx.reduce) ? 'none' : ((S.fx || {}).motion || 'cinema');
 
   function bindCarousels(root) {
     root.querySelectorAll('[data-car]').forEach(car => {
@@ -289,7 +317,12 @@
       const target = new Date((S.details.date || '2030-01-01') + 'T16:00:00').getTime();
       let s = Math.max(0, Math.floor((target - Date.now()) / 1000));
       const v = { d: Math.floor(s / 86400), h: Math.floor(s % 86400 / 3600), m: Math.floor(s % 3600 / 60), s: s % 60 };
-      root.querySelectorAll('[data-cd] [data-u]').forEach(el => el.textContent = v[el.dataset.u]);
+      root.querySelectorAll('[data-cd] [data-u]').forEach(el => {
+        const n = String(v[el.dataset.u]);
+        if (el.dataset.v === n) return;
+        const first = el.dataset.v === undefined; el.dataset.v = n;
+        el.innerHTML = first || fxMotion() === 'none' ? n : `<span class="roll">${n}</span>`;
+      });
     };
     run(); cdTimer = setInterval(run, 1000);
   }
@@ -338,7 +371,7 @@
   let settleT = null;
   function play(root) {
     root.classList.remove('played', 'settled'); void root.offsetWidth; root.classList.add('played');
-    clearTimeout(settleT); settleT = setTimeout(() => root.classList.add('settled'), 2600);
+    clearTimeout(settleT); settleT = setTimeout(() => root.classList.add('settled'), fxMotion() === 'cinema' ? 6800 : 2600);
   }
   function openEnvelope(root, instant) {
     const scr = $('#env-screen'), env = $('#envelope');

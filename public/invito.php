@@ -20,10 +20,12 @@ $theme = $d['theme'] ?? 'amalfi';
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="/assets/envelope.css?v=<?= filemtime(__DIR__ . '/assets/envelope.css') ?>">
 <link rel="stylesheet" href="/assets/invite.css?v=<?= filemtime(__DIR__ . '/assets/invite.css') ?>">
+<link rel="stylesheet" href="/assets/fx.css?v=<?= filemtime(__DIR__ . '/assets/fx.css') ?>">
 </head>
 <body>
 <main class="inv" id="inv"></main>
 <script src="/assets/catalog.js?v=<?= filemtime(__DIR__ . '/assets/catalog.js') ?>"></script>
+<script src="/assets/fx.js?v=<?= filemtime(__DIR__ . '/assets/fx.js') ?>"></script>
 <script src="/assets/invite.js?v=<?= filemtime(__DIR__ . '/assets/invite.js') ?>"></script>
 <script>
 Invite.init(<?= json_encode($d, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) ?>, {

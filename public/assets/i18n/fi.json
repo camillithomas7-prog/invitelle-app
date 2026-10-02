@@ -49,7 +49,8 @@
     "boarding": "Tarkastuskortti",
     "madeWith": "Tehty Invitellellä",
     "change": "Muuta vastausta",
-    "select": "Valitse..."
+    "select": "Valitse...",
+    "seeYou": "Odotamme teitä"
   },
   "diets": {
     "glutine": "Gluteeniton / keliakia",

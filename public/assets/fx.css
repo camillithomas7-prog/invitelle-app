@@ -1,0 +1,188 @@
+/* Invitelle — effetti premium dell'invito (fx.js). Scollegando fx.css e fx.js l'invito torna come prima. */
+.inv { interpolate-size: allow-keywords; }
+
+/* ---------- ATMOSFERA ---------- */
+.atmos { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; opacity: 0; transition: opacity 2.4s ease .6s; }
+.played .atmos { opacity: 1; }
+.burst { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 90; pointer-events: none; }
+
+/* ---------- INTRO CINEMATOGRAFICA ---------- */
+/* il video parte un po' ingrandito e "si allontana", con un velo di luce calda che si dissolve */
+.fx-cinema .intro video { transform-origin: 50% 62%; translate: 0 calc(var(--sy, 0) * 28%); }
+.fx-cinema.played .intro video { animation: fx-dolly 6.5s cubic-bezier(.16,.7,.25,1) both; }
+@keyframes fx-dolly { from { transform: scale(1.22); filter: brightness(1.3) saturate(.8); } 45% { filter: none; } to { transform: scale(1); } }
+.fx-cinema .intro::after { content: ''; position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: 0;
+  background: radial-gradient(ellipse at 50% 42%, #fffaf0 0%, rgba(255,247,230,.92) 38%, rgba(255,240,214,.4) 70%, rgba(255,240,214,0) 100%); }
+.fx-cinema.played:not(.settled) .intro::after { animation: fx-bloom 2.2s ease-out both; }
+@keyframes fx-bloom { from { opacity: 1; } to { opacity: 0; } }
+.fx-cinema .intro .txt { translate: 0 calc(var(--sy, 0) * -38%); opacity: calc(1 - var(--sy, 0) * 1.7); }
+.fx-cinema .intro .scroll-hint { opacity: calc(.7 - var(--sy, 0) * 3); }
+.fx-cinema .intro .shade { background: linear-gradient(to bottom, rgba(255,255,255,.2), transparent 38%, transparent 70%, color-mix(in srgb, var(--paper) 35%, transparent) 86%, var(--paper)); }
+
+/* titolo: ogni riga si scrive da sinistra a destra, come inchiostro */
+.fx-cinema.played .intro .txt > .hl { animation: none; opacity: 1; transform: none; }
+.fx-cinema .intro .hl > div.ink { -webkit-mask-image: linear-gradient(90deg, #000 42%, transparent 58%); mask-image: linear-gradient(90deg, #000 42%, transparent 58%);
+  -webkit-mask-size: 280% 100%; mask-size: 280% 100%; -webkit-mask-position: 100% 0; mask-position: 100% 0; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
+.fx-cinema.played .intro .hl > div.ink { animation: fx-ink 1.7s cubic-bezier(.45,.05,.2,1) calc(.9s + var(--li) * .34s) both; }
+@keyframes fx-ink { from { -webkit-mask-position: 100% 0; mask-position: 100% 0; filter: blur(5px); transform: translateY(8px); }
+  to { -webkit-mask-position: 0 0; mask-position: 0 0; filter: blur(0); transform: none; } }
+/* la data arriva per ultima, le lettere si stringono e due filetti si allungano ai lati */
+.fx-cinema .intro .date { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.fx-cinema .intro .date::before, .fx-cinema .intro .date::after { content: ''; flex: 0 100 34px; min-width: 8px; height: 1px; background: currentColor; opacity: .65; transform: scaleX(0); }
+.fx-cinema .intro .date::before { transform-origin: right; } .fx-cinema .intro .date::after { transform-origin: left; }
+.fx-cinema.played .intro .txt > .date { animation: fx-date 1.8s cubic-bezier(.2,.7,.2,1) calc(1.3s + var(--nl, 3) * .34s) both; }
+.fx-cinema.played .intro .date::before, .fx-cinema.played .intro .date::after { animation: fx-line 1.2s cubic-bezier(.6,0,.2,1) calc(2s + var(--nl, 3) * .34s) forwards; }
+@keyframes fx-date { from { opacity: 0; letter-spacing: .55em; filter: blur(4px); } to { opacity: 1; letter-spacing: .14em; filter: none; } }
+@keyframes fx-line { to { transform: scaleX(1); } }
+/* fine dell'animazione: tutto fermo (le modifiche dal pannello non la fanno ripartire) */
+.fx-cinema.settled .intro .hl > div.ink { animation: none; -webkit-mask-image: none; mask-image: none; filter: none; transform: none; }
+.fx-cinema.settled .intro .date::before, .fx-cinema.settled .intro .date::after { animation: none; transform: none; }
+.fx-cinema.settled .intro video { animation: none; }
+
+/* ---------- ORNAMENTO TRA I BLOCCHI ---------- */
+.orn { display: flex; justify-content: center; margin: -16px 0; position: relative; z-index: 1; color: var(--accent); pointer-events: none; }
+.orn svg { width: 200px; height: 22px; overflow: visible; }
+.orn path { fill: none; stroke: currentColor; stroke-width: 1; stroke-linecap: round; opacity: .75; }
+.orn .dm { fill: currentColor; stroke: none; opacity: .85; transform-origin: 120px 12px; }
+.fx-cinema .orn.reveal { opacity: 1; transform: none; }
+.fx-cinema .orn path:not(.dm) { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 2s cubic-bezier(.6,0,.2,1) .15s; }
+.fx-cinema .orn .dm { transform: scale(0) rotate(-90deg); transition: transform .9s cubic-bezier(.34,1.56,.64,1) .2s; }
+.fx-cinema .orn.in path:not(.dm) { stroke-dashoffset: 0; }
+.fx-cinema .orn.in .dm { transform: none; }
+
+/* ---------- BLOCCHI: ogni elemento entra in sequenza ---------- */
+.fx-cinema .blk.reveal { opacity: 1; transform: none; transition: none; }
+.fx-cinema .blk > :not(.fl):not(.ph-bg) { transition: opacity 1.1s ease, transform 1.2s cubic-bezier(.2,.7,.2,1), filter 1.1s ease, clip-path 1.3s cubic-bezier(.6,0,.2,1);
+  transition-delay: calc(var(--i, 0) * 120ms + 60ms); }
+.fx-cinema .blk.reveal:not(.in) > :not(.fl):not(.ph-bg) { opacity: 0; transform: translateY(28px); filter: blur(6px); }
+.fx-cinema .blk.reveal:not(.in) > .ico { transform: scale(.35) rotate(-30deg); filter: none; }
+.fx-cinema .blk > .ico { transition: opacity .9s ease, transform 1.1s cubic-bezier(.34,1.56,.64,1); }
+.fx-cinema .blk.reveal:not(.in) > h2 { transform: translateY(45%); clip-path: inset(0 -10% 100% -10%); filter: none; }
+.fx-cinema .blk > h2 { clip-path: inset(-20% -10% -25% -10%); }
+/* i bordi floreali crescono dai lati */
+.fx-cinema .blk .fl { transition: transform 1.8s cubic-bezier(.2,.7,.2,1), opacity 1.6s ease; }
+.fx-cinema .blk.reveal:not(.in) .fl-l { transform: translateX(-45%) rotate(-6deg); opacity: 0; }
+.fx-cinema .blk.reveal:not(.in) .fl-r { transform: scaleX(-1) translateX(-45%) rotate(-6deg); opacity: 0; }
+
+/* foto che scorrono più lente (parallasse) */
+.fx-cinema .blk.photo > .ph-bg { inset: -16% 0; }
+.fx-cinema [data-par] { will-change: translate; }
+
+/* conto alla rovescia: riquadri in vetro, numeri che ruotano */
+.cd div { position: relative; overflow: hidden; }
+.cd b { overflow: hidden; }
+.cd b .roll { display: inline-block; animation: fx-roll .55s cubic-bezier(.2,.7,.2,1); }
+@keyframes fx-roll { from { transform: translateY(-70%); opacity: 0; filter: blur(2px); } }
+.fx-cinema .cd div { transition: opacity .9s ease, transform 1s cubic-bezier(.2,.7,.2,1); }
+.fx-cinema .cd div:nth-child(2) { transition-delay: .1s; } .fx-cinema .cd div:nth-child(3) { transition-delay: .2s; } .fx-cinema .cd div:nth-child(4) { transition-delay: .3s; }
+.fx-cinema .blk.reveal:not(.in) .cd div { opacity: 0; transform: translateY(24px) scale(.92); }
+.cd div::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.45) 48%, transparent 62%); transform: translateX(-120%); }
+.fx-cinema .blk.in .cd div::after { animation: fx-sheen 5s ease-in-out 1.2s infinite; }
+.fx-cinema .cd div:nth-child(2)::after { animation-delay: 1.35s !important; } .fx-cinema .cd div:nth-child(3)::after { animation-delay: 1.5s !important; } .fx-cinema .cd div:nth-child(4)::after { animation-delay: 1.65s !important; }
+@keyframes fx-sheen { 0%, 60% { transform: translateX(-120%); } 85%, 100% { transform: translateX(120%); } }
+
+/* programma: la linea si disegna scorrendo e ogni tappa si accende */
+.fx-cinema .tl::before { transform-origin: top; transform: scaleY(var(--p, 0)); }
+.fx-cinema .tl .it::after { transform: scale(0); transition: transform .55s cubic-bezier(.34,1.56,.64,1), box-shadow .6s; }
+.fx-cinema .tl .it.lit::after { transform: scale(1); box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 18%, transparent); }
+.fx-cinema .tl .it > * { opacity: .12; transform: translateX(14px); transition: opacity .8s ease, transform .9s cubic-bezier(.2,.7,.2,1); }
+.fx-cinema .tl .it > .t { transform: translateX(-14px); }
+.fx-cinema .tl .it.lit > * { opacity: 1; transform: none; }
+
+/* la nostra storia: filo centrale che cresce, foto che si svelano */
+.fx-cinema .story::before { transform-origin: top; transform: translateX(-50%) scaleY(var(--p, 0)); }
+.fx-cinema .st-it .st-dot { transform: scale(0); transition: transform .6s cubic-bezier(.34,1.56,.64,1); }
+.fx-cinema .st-it.lit .st-dot { transform: scale(1); }
+.fx-cinema .st-it > :not(.st-dot) { opacity: 0; transform: translateY(22px); transition: opacity 1s ease .15s, transform 1.1s cubic-bezier(.2,.7,.2,1) .15s, clip-path 1.4s cubic-bezier(.6,0,.2,1) .2s; }
+.fx-cinema .st-it.lit > :not(.st-dot) { opacity: 1; transform: none; }
+.fx-cinema .st-it img { clip-path: inset(0 0 100% 0 round 10px); }
+.fx-cinema .st-it.lit img { clip-path: inset(0 0 0 0 round 10px); }
+.fx-cinema .st-it.final.lit .st-dot { animation: fx-heart 1.8s ease-in-out .4s infinite; }
+@keyframes fx-heart { 0%, 100% { box-shadow: 0 0 0 5px var(--paper), 0 0 0 6px color-mix(in srgb, var(--accent) 40%, transparent); } 50% { box-shadow: 0 0 0 5px var(--paper), 0 0 0 14px color-mix(in srgb, var(--accent) 12%, transparent); } }
+
+/* galleria: effetto "coverflow", le foto ai lati arretrano */
+.fx-cinema .car-slide { transform: scale(calc(1 - var(--d, 0) * .14)); opacity: calc(1 - var(--d, 0) * .5); transition: transform .12s linear, opacity .12s linear; }
+.fx-cinema .car-slide img { transform: scale(calc(1 + var(--d, 0) * .12)); }
+
+/* palette del dress code e portate del menù */
+.fx-cinema .swatches i { transition: transform .7s cubic-bezier(.34,1.56,.64,1); }
+.fx-cinema .blk.reveal:not(.in) .swatches i { transform: scale(0); }
+.fx-cinema .swatches i:nth-child(1) { transition-delay: .45s; } .fx-cinema .swatches i:nth-child(2) { transition-delay: .55s; } .fx-cinema .swatches i:nth-child(3) { transition-delay: .65s; }
+.fx-cinema .swatches i:nth-child(4) { transition-delay: .75s; } .fx-cinema .swatches i:nth-child(5) { transition-delay: .85s; } .fx-cinema .swatches i:nth-child(n+6) { transition-delay: .95s; }
+.menu .c + .c::before { content: ''; display: block; width: 36px; height: 1px; margin: 0 auto 16px; background: var(--accent); opacity: .5; }
+.fx-cinema .menu .c { transition: opacity .9s ease, transform 1s cubic-bezier(.2,.7,.2,1); }
+.fx-cinema .blk.reveal:not(.in) .menu .c { opacity: 0; transform: translateY(16px); }
+.fx-cinema .menu .c:nth-child(2) { transition-delay: .5s; } .fx-cinema .menu .c:nth-child(3) { transition-delay: .65s; } .fx-cinema .menu .c:nth-child(4) { transition-delay: .8s; }
+.fx-cinema .menu .c:nth-child(5) { transition-delay: .95s; } .fx-cinema .menu .c:nth-child(n+6) { transition-delay: 1.1s; }
+.fx-cinema .menu .c:nth-child(1) { transition-delay: .35s; }
+
+/* carta d'imbarco: rotta tratteggiata e aereo che vola */
+.bp .plane { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; margin: 0 10px; }
+.bp .plane::before { content: ''; position: absolute; left: 4%; right: 4%; top: 50%; border-top: 1.5px dashed color-mix(in srgb, var(--accent) 55%, transparent); }
+.bp .plane svg { position: relative; transform: rotate(90deg); background: #fff; padding: 0 2px; box-sizing: content-box; }
+.fx-cinema .blk.in .bp .plane svg { animation: fx-fly 2.4s cubic-bezier(.3,.1,.2,1) .7s both; }
+@keyframes fx-fly { from { translate: -70px 0; opacity: 0; } 30% { opacity: 1; } to { translate: 0 0; } }
+
+/* domande frequenti: apertura morbida */
+.faq details::details-content { height: 0; overflow: clip; transition: height .45s cubic-bezier(.2,.7,.2,1), content-visibility .45s allow-discrete; }
+.faq details[open]::details-content { height: auto; }
+.faq summary::after { content: '+' !important; transition: transform .35s ease; font-size: 22px; line-height: 1; }
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq summary::-webkit-details-marker { display: none; }
+
+/* ---------- RSVP ---------- */
+.rsvp input[type=text], .rsvp input[type=email], .rsvp input[type=tel], .rsvp textarea, .rsvp select { transition: border-color .25s, box-shadow .25s, background .25s; }
+.rsvp input:focus, .rsvp textarea:focus, .rsvp select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent); background: #fff; }
+.rsvp .opt { padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent); border-radius: 10px; transition: background .25s, border-color .25s, transform .2s; align-items: center; }
+.rsvp .opt input { margin-top: 0; }
+.rsvp .opt:has(input:checked) { background: color-mix(in srgb, var(--accent) 12%, transparent); border-color: color-mix(in srgb, var(--accent) 60%, transparent); }
+.rsvp .opt:active { transform: scale(.98); }
+.rsvp .send { position: relative; overflow: hidden; transition: transform .2s, box-shadow .3s; box-shadow: 0 10px 24px color-mix(in srgb, var(--accent) 30%, transparent); }
+.rsvp .send::after { content: ''; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,.4) 50%, transparent 65%); transform: translateX(-100%); animation: fx-sheen 4.5s ease-in-out 1.5s infinite; }
+.rsvp .send:active { transform: scale(.98); }
+#yes-part:not([hidden]) { animation: fx-open .6s cubic-bezier(.2,.7,.2,1); }
+@keyframes fx-open { from { opacity: 0; transform: translateY(-8px); } }
+.rsvp .thanks { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.rsvp .thanks svg { width: 64px; height: 64px; color: var(--accent); }
+.rsvp .thanks svg * { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
+.rsvp .thanks svg circle { animation: fx-draw 1s cubic-bezier(.6,0,.2,1) forwards; }
+.rsvp .thanks svg path { animation: fx-draw .6s cubic-bezier(.6,0,.2,1) .8s forwards; }
+.rsvp .thanks p { margin: 0; animation: fx-open 1s ease .9s both; }
+@keyframes fx-draw { to { stroke-dashoffset: 0; } }
+
+/* ---------- FINALE ---------- */
+.finale { position: relative; z-index: 1; text-align: center; padding: 64px 30px 10px; }
+.finale .ring { position: relative; width: 148px; height: 148px; margin: 0 auto; }
+.finale .ring svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; color: var(--accent); }
+.finale .ring circle, .finale .ring path { fill: none; stroke: currentColor; stroke-width: 1; stroke-linecap: round; }
+.finale .ring .c2 { opacity: .45; }
+.finale .ring .lf { fill: currentColor; stroke: none; opacity: .7; }
+.finale .mono { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Pinyon Script', cursive; font-size: 40px; color: var(--accent); white-space: nowrap; padding-top: 4px; }
+.finale .fin-names { font-family: 'Pinyon Script', cursive; font-size: 46px; line-height: 1.15; margin: 28px 0 6px; color: var(--accent-strong, var(--bc)); }
+.finale .fin-t { font-size: 13px; letter-spacing: .34em; text-transform: uppercase; opacity: .75; margin: 0; }
+.finale .fin-d { font-size: 19px; letter-spacing: .12em; margin-top: 8px; }
+.fx-cinema .finale.reveal { opacity: 1; transform: none; }
+.fx-cinema .finale .ring circle, .fx-cinema .finale .ring path:not(.lf) { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 2.4s cubic-bezier(.6,0,.2,1); }
+.fx-cinema .finale .ring .c2 { transition-delay: .4s; }
+.fx-cinema .finale .ring .lf { transform: scale(0); transform-box: fill-box; transform-origin: center; transition: transform .8s cubic-bezier(.34,1.56,.64,1) 1.6s; }
+.fx-cinema .finale.in .ring circle, .fx-cinema .finale.in .ring path:not(.lf) { stroke-dashoffset: 0; }
+.fx-cinema .finale.in .ring .lf { transform: none; }
+.fx-cinema .finale .mono, .fx-cinema .finale .fin-names, .fx-cinema .finale .fin-t, .fx-cinema .finale .fin-d { opacity: 0; transform: translateY(14px); filter: blur(5px); transition: opacity 1.2s ease, transform 1.3s cubic-bezier(.2,.7,.2,1), filter 1.2s ease; }
+.fx-cinema .finale .mono { transition-delay: .9s; } .fx-cinema .finale .fin-names { transition-delay: 1.4s; } .fx-cinema .finale .fin-t { transition-delay: 1.8s; } .fx-cinema .finale .fin-d { transition-delay: 2.1s; }
+.fx-cinema .finale.in .mono, .fx-cinema .finale.in .fin-names, .fx-cinema .finale.in .fin-t, .fx-cinema .finale.in .fin-d { opacity: 1; transform: none; filter: none; }
+
+/* ---------- PULSANTE MUSICA: barre che danzano ---------- */
+.snd .eq { display: flex; align-items: flex-end; gap: 2.5px; height: 16px; }
+.snd .eq i { width: 2.5px; height: 100%; border-radius: 2px; background: currentColor; transform-origin: bottom; animation: fx-eq 1s ease-in-out infinite; }
+.snd .eq i:nth-child(2) { animation-delay: -.4s; animation-duration: .8s; } .snd .eq i:nth-child(3) { animation-delay: -.2s; animation-duration: 1.2s; } .snd .eq i:nth-child(4) { animation-delay: -.6s; animation-duration: .9s; }
+@keyframes fx-eq { 0%, 100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
+.snd { transition: transform .25s; } .snd:active { transform: scale(.92); }
+
+/* ---------- SENZA ANIMAZIONI ---------- */
+.fx-none .reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+.fx-none .intro .txt > * { animation: none !important; opacity: 1 !important; transform: none !important; }
+.fx-none .rsvp .send::after, .fx-none .cd div::after { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .inv *, .inv *::before, .inv *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+.preview .orn path:not(.dm) { stroke-dashoffset: 0; }

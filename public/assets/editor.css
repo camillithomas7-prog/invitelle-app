@@ -479,3 +479,10 @@ body.wide .pl-table, body.wide .ck-g, body.wide .pl-prog { max-width: 1100px; }
 .env-mini-css { position: relative; overflow: hidden; }
 .env-mini-css .envx { position: absolute; inset: 0; }
 .env-st .env-photo { background-size: 180% !important; }
+
+/* effetti dell'invito */
+.fx-opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.fx-opt { text-align: left; padding: 11px 13px; border: 1px solid var(--line2); border-radius: 10px; background: #fff; display: flex; flex-direction: column; gap: 3px; transition: border-color .2s, box-shadow .2s; }
+.fx-opt b { font-size: 14px; font-weight: 600; }
+.fx-opt small { font-size: 12px; opacity: .65; line-height: 1.35; }
+.fx-opt.on { border-color: var(--brand); box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 22%, transparent); }

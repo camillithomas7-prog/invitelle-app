@@ -5,6 +5,8 @@ res=$(higgsfield generate create "$@" --wait --wait-timeout 25m --json 2>&1)
 ext="${out##*.}"
 # per i video/audio prende il file con la stessa estensione (non la miniatura jpg)
 url=$(echo "$res" | grep -Eo "https://[^\"]+\.$ext" | tail -1)
-case "$ext" in png|jpg|jpeg|webp) [ -z "$url" ] && url=$(echo "$res" | grep -Eo 'https://[^"]+\.(png|jpg|jpeg|webp)' | head -1);; esac
+# immagini: il risultato è il file hf_ (non la miniatura _min né la foto di riferimento caricata con --image)
+case "$ext" in png|jpg|jpeg|webp) url=$(echo "$res" | grep -Eo 'https://[^"]+/hf_[^"]+\.(png|jpg|jpeg|webp)' | grep -v '_min\.' | head -1)
+  [ -z "$url" ] && url=$(echo "$res" | grep -Eo 'https://[^"]+\.(png|jpg|jpeg|webp)' | head -1);; esac
 if [ -z "$url" ]; then echo "FAIL $out: $res" | head -c 600; echo; exit 1; fi
 curl -sL "$url" -o "$out" && echo "OK $out"

@@ -42,6 +42,7 @@
 
   let S = window.__INVITE.data;
   if (!S.blocksStyle.iconColor) S.blocksStyle.iconColor = '#a8864f';
+  S.fx = Object.assign({ motion: 'cinema', particles: 'auto' }, S.fx || {});
   S.album = Object.assign({ cardStyle: 'avorio', enabled: true, askName: true, cardTitle: 'Condividi i tuoi scatti', cardText: 'Inquadra il codice e carica le foto e i video della festa' }, S.album || {});
   // aggiorna i blocchi "La nostra storia" creati con la versione precedente
   (S.blocks || []).filter(b => b.type === 'story').forEach(b => {
@@ -144,7 +145,18 @@
         <div class="vid" style="background-image:url('${t.poster}')"><video src="${t.video}" poster="${t.poster}" muted loop playsinline preload="none"></video>
         <span class="play">${I.play}</span>${t.popular ? '<span class="pop">Popolare</span>' : ''}${S.theme === t.id ? `<span class="chk">${I.check}</span>` : ''}</div>
         <div class="meta"><b>${esc(t.name)}</b><small>${esc(t.desc)}</small></div></button>`).join('')}
-        </div>${paperSec()}`;
+        </div>${fxSec()}${paperSec()}`;
+  }
+  // effetti dell'invito: animazioni e atmosfera sopra il video iniziale
+  function fxSec() {
+    const m = S.fx.motion, p = S.fx.particles;
+    const motions = [['cinema', 'Cinematiche', 'Titolo scritto a mano, video che si apre, blocchi in sequenza, linee che si disegnano'], ['soft', 'Delicate', 'Solo dissolvenze leggere'], ['none', 'Nessuna', 'Invito fermo']];
+    const parts = [['auto', 'Automatica', 'In base al tema'], ['oro', 'Polvere d\'oro', 'Bagliori dorati che salgono'], ['petali', 'Petali', 'Petali di rosa che cadono'], ['lucciole', 'Lucciole', 'Luci calde che danzano'], ['neve', 'Neve', 'Fiocchi leggeri'], ['none', 'Nessuna', '']];
+    const opt = (path, cur, [v, t, d]) => `<button type="button" data-set="${path}" data-v="${v}" class="fx-opt ${cur === v ? 'on' : ''}"><b>${t}</b>${d ? `<small>${d}</small>` : ''}</button>`;
+    return `<div class="sec" style="margin-top:26px"><h3>Effetti dell'invito</h3>
+      <p class="hint" style="margin:-6px 0 12px">Come si muove l'invito quando gli ospiti lo aprono e lo scorrono.</p>
+      <label class="l">Animazioni</label><div class="fx-opts">${motions.map(x => opt('fx.motion', m, x)).join('')}</div>
+      <label class="l" style="margin-top:14px">Atmosfera sopra il video</label><div class="fx-opts">${parts.map(x => opt('fx.particles', p, x)).join('')}</div></div>`;
   }
   // colore di sfondo dell'invito (sotto l'animazione iniziale, dietro a tutti i blocchi)
   function paperSec() {
@@ -678,7 +690,7 @@
     if (st && !e.target.closest('[data-action]')) {
       set(st.dataset.set, st.dataset.v); changed(true);
       if (st.dataset.set.startsWith('envelope')) post({ data: S, view: 'envelope' });
-      if (st.dataset.set === 'theme') post({ replay: true });
+      if (st.dataset.set === 'theme' || st.dataset.set.startsWith('fx.')) post({ replay: true });
       return;
     }
     const ac = e.target.closest('[data-action]'); if (!ac) return;

@@ -49,7 +49,8 @@
     "boarding": "탑승권",
     "madeWith": "Invitelle로 제작",
     "change": "회신 수정",
-    "select": "선택하세요..."
+    "select": "선택하세요...",
+    "seeYou": "여러분을 기다리겠습니다"
   },
   "diets": {
     "glutine": "글루텐 프리 / 셀리악병",
