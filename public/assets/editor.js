@@ -254,6 +254,14 @@
         <p class="hint">Per eventi di più giorni inserisci una data di fine: verrà mostrato l'intervallo.</p>
         <label class="l">Dimensione data</label><div class="range"><input type="range" min="12" max="34" data-k="details.dateSize" value="${d.dateSize}"><output>${d.dateSize}px</output></div>
         <label class="l">Posizione della data</label><div class="seg"><button type="button" data-set="details.datePos" data-v="above" class="${d.datePos === 'above' ? 'on' : ''}">Sopra il titolo</button><button type="button" data-set="details.datePos" data-v="below" class="${d.datePos === 'below' ? 'on' : ''}">Sotto il titolo</button></div>
+        <label class="l" style="margin-top:16px">Posizione del testo sul video</label>
+        <div class="txtpos-wrap"><div class="txtpos" data-txtpos style="background-image:url('${(INV.themes.find(t => t.id === S.theme) || INV.themes[0]).poster}')">
+          <div class="tp-box" style="left:${d.textX ?? 50}%;top:${d.textY ?? 11}%;color:${esc(d.textColor)};font-family:'${esc(d.headlineFont === 'global' ? S.blocksStyle.font : d.headlineFont)}'">${(d.headline || '').split('\n').filter(Boolean).map(l => `<div>${esc(l)}</div>`).join('')}${d.date ? `<small>${esc(d.date.split('-').reverse().join('.'))}</small>` : ''}</div></div>
+          <div><p class="hint" style="margin-top:0">Trascina i nomi nel punto del video dove si leggono meglio, per esempio su una zona di cielo o più calma.</p>
+          <button type="button" class="btn sm" data-action="txtpos-reset">Rimetti in alto al centro</button></div></div>
+        <label class="l" style="margin-top:16px">Leggibilità del testo sul video</label>
+        <div class="seg seg-wrap">${[['auto', 'Automatica'], ['soft', 'Velo leggero'], ['strong', 'Velo intenso'], ['card', 'Cartoncino'], ['none', 'Nessuna']].map(([v, t]) => `<button type="button" data-set="details.textBg" data-v="${v}" class="${(d.textBg || 'auto') === v ? 'on' : ''}">${t}</button>`).join('')}</div>
+        <p class="hint">Un velo sfumato dietro a nomi e data (chiaro se il testo è scuro, scuro se il testo è chiaro) per staccarli dai video molto luminosi o pieni di dettagli.</p>
         <div style="margin-top:16px">${tog('scratch', 'Gratta e scopri la data', 'La data è coperta da una patina dorata: gli ospiti la grattano col dito e parte una pioggia di coriandoli', 'fx.scratch')}</div></div>
       <div class="sec"><h3><span class="dot"></span>Titolo di apertura</h3>${area('details.headline', 'Giulia\n&\nMarco')}
         <p class="hint">Premi Invio per andare a capo: ogni riga appare su una riga separata dell'invito.<br>Meno è meglio: lascia parlare il tema animato.</p>
@@ -638,12 +646,28 @@
     if (tab === 'audio') initWave(); else stopStartAudio();
     if (tab === 'languages' && langSearch) { const q = langSearch.toLowerCase().trim(); panel.querySelectorAll('.lang-it').forEach(x => x.hidden = !x.dataset.q.includes(q)); }
     panel.querySelectorAll('[data-focus]').forEach(bindFocus);
+    panel.querySelectorAll('[data-txtpos]').forEach(bindTxtPos);
     panel.querySelectorAll('.theme').forEach(c => {
       const v = c.querySelector('video');
       if (!v) return;
       c.addEventListener('mouseenter', () => v.play().catch(() => {}));
       c.addEventListener('mouseleave', () => { v.pause(); v.currentTime = 0; });
     });
+  }
+
+  // ---------- posizione del testo sul video (trascina i nomi) ----------
+  function bindTxtPos(box) {
+    const lbl = box.querySelector('.tp-box'); let start = null;
+    box.addEventListener('pointerdown', e => { const d = S.details; start = { x: e.clientX, y: e.clientY, px: d.textX ?? 50, py: d.textY ?? 11 }; box.setPointerCapture(e.pointerId); box.classList.add('dragging'); e.preventDefault(); });
+    box.addEventListener('pointermove', e => {
+      if (!start) return;
+      const r = box.getBoundingClientRect(), d = S.details;
+      d.textX = Math.round(Math.max(20, Math.min(80, start.px + (e.clientX - start.x) / r.width * 100)));
+      d.textY = Math.round(Math.max(2, Math.min(75, start.py + (e.clientY - start.y) / r.height * 100)));
+      lbl.style.left = d.textX + '%'; lbl.style.top = d.textY + '%'; changed();
+    });
+    const end = () => { start = null; box.classList.remove('dragging'); };
+    box.addEventListener('pointerup', end); box.addEventListener('pointercancel', end);
   }
 
   // ---------- posizione della foto (trascina per inquadrare) ----------
@@ -782,6 +806,7 @@
       case 'start-nudge': {
         const cur = S.audio.starts?.[S.audio.track] || 0;
         setStart(ac.dataset.d === 'reset' ? 0 : cur + +ac.dataset.d, true); } break;
+      case 'txtpos-reset': S.details.textX = 50; S.details.textY = 11; changed(true); break;
       case 'focus-reset': Object.assign(get(ac.dataset.p), { posX: 50, posY: 50, zoom: 100 }); changed(true); break;
       case 'lang-rm': S.languages.extra = (S.languages.extra || []).filter(l => l !== ac.dataset.l); changed(true); break;
       case 'icons-all': { const v = +ac.dataset.v; S.blocks.forEach(b => b.icon = v); S.rsvp.icon = v; changed(true); toast(v ? 'Icone a linea applicate a tutti i blocchi' : 'Icone classiche 3D ripristinate'); } break;

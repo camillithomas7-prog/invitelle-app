@@ -270,6 +270,11 @@
       root.prepend(intro);
     }
     intro.classList.toggle('light-txt', isLight(d.textColor));
+    // leggibilità del titolo sopra il video: velo morbido (auto/soft/strong), cartoncino in vetro (card) o niente
+    intro.dataset.read = d.textBg || 'auto';
+    // posizione del testo scelta trascinandolo nel pannello (centro orizzontale e altezza, in %)
+    const tx = Math.max(20, Math.min(80, d.textX ?? 50)), ty = Math.max(2, Math.min(75, d.textY ?? 11));
+    const tEl = $('.txt', intro); tEl.style.top = ty + '%'; tEl.style.left = (tx - 50) + '%'; tEl.style.right = (50 - tx) + '%';
     intro.classList.toggle('dark-txt', !isLight(d.textColor));
     $('.txt', intro).innerHTML = introTextHTML();
     $('.scroll-hint', intro).firstChild.textContent = T('scroll');

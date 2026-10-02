@@ -257,3 +257,19 @@
 .blk .sub, .blk p { text-wrap: pretty; }
 @media (max-width: 420px) { .has-flowers .blk:not(.photo) > h2 { font-size: clamp(25px, 7vw, 32px); } }
 .has-flowers .rsvp label.f { text-shadow: 0 0 6px var(--paper), 0 0 2px var(--paper); }
+
+/* ---------- LEGGIBILITÀ DEL TITOLO SUL VIDEO ---------- */
+.intro .txt::before { content: ''; position: absolute; z-index: -1; left: 50%; top: 50%; width: 125%; height: 135%; transform: translate(-50%, -50%);
+  pointer-events: none; border-radius: 50%; opacity: 0; transition: opacity .6s; }
+.intro.dark-txt .txt::before { background: radial-gradient(closest-side, rgba(255,252,246,.88), rgba(255,252,246,.55) 55%, rgba(255,252,246,0)); }
+.intro.light-txt .txt::before { background: radial-gradient(closest-side, rgba(20,14,10,.62), rgba(20,14,10,.35) 55%, rgba(20,14,10,0)); }
+.intro[data-read="auto"] .txt::before { opacity: .78; }
+.intro[data-read="soft"] .txt::before { opacity: .55; }
+.intro[data-read="strong"] .txt::before { opacity: 1; width: 140%; height: 150%; }
+.intro[data-read="card"] .txt { padding-top: 22px; padding-bottom: 22px; }
+.intro[data-read="card"] .txt::before { opacity: 1; width: calc(100% - 36px); height: 100%; border-radius: 22px; -webkit-backdrop-filter: blur(10px) saturate(1.1); backdrop-filter: blur(10px) saturate(1.1);
+  box-shadow: 0 10px 40px rgba(0,0,0,.12), inset 0 0 0 1px rgba(255,255,255,.35); }
+.intro.dark-txt[data-read="card"] .txt::before { background: rgba(255,252,246,.55); }
+.intro.light-txt[data-read="card"] .txt::before { background: rgba(25,18,14,.38); }
+.intro[data-read="strong"].dark-txt .hl, .intro[data-read="strong"].dark-txt .date { text-shadow: 0 0 18px rgba(255,255,255,.9), 0 1px 2px rgba(255,255,255,.8); }
+.intro[data-read="strong"].light-txt .hl, .intro[data-read="strong"].light-txt .date { text-shadow: 0 0 18px rgba(0,0,0,.65), 0 1px 3px rgba(0,0,0,.6); }
