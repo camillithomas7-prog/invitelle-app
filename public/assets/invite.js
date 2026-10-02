@@ -99,14 +99,14 @@
       const days = b.data.days || [];
       const tabs = days.length > 1 ? `<div class="day-tabs">${days.map((d, i) => `<button type="button" data-day="${i}" class="${i ? '' : 'on'}">${esc(d.label || T('day') + ' ' + (i + 1))}</button>`).join('')}</div>` : '';
       return `<h2>${esc(b.data.title)}</h2>${tabs}` + days.map((v, i) => `<div class="card-w" data-dayp="${i}" ${i ? 'hidden' : ''}>
-        ${v.image ? `<img class="venue-img" src="${esc(v.image)}" alt="">` : ''}
+        ${v.image ? `<img class="venue-img" src="${esc(v.image)}" alt="" loading="lazy" decoding="async">` : ''}
         ${v.address ? `<iframe class="map" loading="lazy" src="https://maps.google.com/maps?q=${encodeURIComponent(v.address)}&z=14&output=embed"></iframe>` : ''}
         <div class="pad">${days.length === 1 && v.label ? `<div class="caps" style="opacity:.6">${esc(v.label)}</div>` : ''}
         <p style="font-size:22px;margin:6px 0 4px"><b style="font-weight:600">${esc(v.name)}</b></p><div class="caps" style="opacity:.75;line-height:1.6">${esc(v.address)}</div>
         ${mapsUrl(v) ? `<a class="btn-soft" href="${esc(mapsUrl(v))}" target="_blank" rel="noopener">${ICON_PIN}${T('openMaps')}</a>` : ''}</div></div>`).join('');
     },
-    destination: b => `<h2>${esc(b.data.title)}</h2><p class="sub">${esc(b.data.place)}</p>${b.data.image ? `<img src="${esc(b.data.image)}" style="border-radius:10px;margin:0 auto 16px;max-height:300px;object-fit:cover;width:100%" alt="">` : ''}<p>${esc(b.data.text)}</p>${b.data.tips ? `<p style="font-size:16px;opacity:.75">${esc(b.data.tips)}</p>` : ''}`,
-    drawing: b => b.data.image ? `<div class="draw"><img src="${esc(b.data.image)}" alt="">${b.data.caption ? `<p style="margin-top:12px">${esc(b.data.caption)}</p>` : ''}</div>` : `<p style="opacity:.4">Carica un disegno dal pannello</p>`,
+    destination: b => `<h2>${esc(b.data.title)}</h2><p class="sub">${esc(b.data.place)}</p>${b.data.image ? `<img src="${esc(b.data.image)}" loading="lazy" decoding="async" style="border-radius:10px;margin:0 auto 16px;max-height:300px;object-fit:cover;width:100%" alt="">` : ''}<p>${esc(b.data.text)}</p>${b.data.tips ? `<p style="font-size:16px;opacity:.75">${esc(b.data.tips)}</p>` : ''}`,
+    drawing: b => b.data.image ? `<div class="draw"><img src="${esc(b.data.image)}" alt="" loading="lazy" decoding="async">${b.data.caption ? `<p style="margin-top:12px">${esc(b.data.caption)}</p>` : ''}</div>` : `<p style="opacity:.4">Carica un disegno dal pannello</p>`,
     timeline: b => `<h2>${esc(b.data.title)}</h2><div class="tl" data-draw>${(b.data.items || []).map(i => `<div class="it" data-lit><div class="t">${esc(i.time)}</div><div><div class="n">${esc(i.title)}</div>${i.text ? `<div class="d">${esc(i.text)}</div>` : ''}</div></div>`).join('')}</div>`,
     story: b => {
       const d = b.data, key = x => x.date || x.year || '';
@@ -114,7 +114,7 @@
       const when = x => { const v = key(x); return /^\d{4}-\d{2}-\d{2}$/.test(v) ? fmtDate(v) : v; };
       const step = (x, last) => `<div class="st-it ${last ? 'final' : ''}" data-lit><span class="st-dot"></span>
         ${when(x) ? `<div class="yr">${esc(when(x))}</div>` : ''}<p class="st-t">${esc(x.title)}</p>
-        ${x.image ? `<img src="${esc(x.image)}" alt="" loading="lazy">` : ''}${x.text ? `<p class="st-x">${esc(x.text)}</p>` : ''}</div>`;
+        ${x.image ? `<img src="${esc(x.image)}" alt="" loading="lazy" decoding="async">` : ''}${x.text ? `<p class="st-x">${esc(x.text)}</p>` : ''}</div>`;
       const wed = d.showWedding !== false && S.details.date ? step({ date: S.details.date, title: d.weddingTitle || 'Il grande giorno', text: d.weddingText || '' }, true) : '';
       return `<h2>${esc(d.title)}</h2>${d.intro ? `<p style="font-style:italic;opacity:.8">${esc(d.intro)}</p>` : ''}<div class="story" data-draw>${items.map(x => step(x)).join('')}${wed}</div>`;
     },
@@ -123,7 +123,7 @@
       if (!imgs.length) return `<h2>${esc(b.data.title)}</h2><p style="opacity:.4">Aggiungi le foto dal pannello</p>`;
       const many = imgs.length > 1;
       return `<h2>${esc(b.data.title)}</h2><div class="car" data-car>
-        <div class="car-track">${imgs.map((u, i) => `<div class="car-slide"><img src="${esc(u)}" alt="" loading="${i < 2 ? 'eager' : 'lazy'}" draggable="false"></div>`).join('')}</div>
+        <div class="car-track">${imgs.map((u, i) => `<div class="car-slide"><img src="${esc(u)}" alt="" loading="lazy" decoding="async" draggable="false"></div>`).join('')}</div>
         ${many ? `<button type="button" class="car-btn prev" data-car-go="-1" aria-label="Foto precedente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
         <button type="button" class="car-btn next" data-car-go="1" aria-label="Foto successiva"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
         <div class="car-dots">${imgs.map((_, i) => `<i class="${i ? '' : 'on'}" data-car-to="${i}"></i>`).join('')}</div><div class="car-count">1 / ${imgs.length}</div>` : ''}</div>`;
@@ -264,7 +264,8 @@
       intro = document.createElement('div');
       intro.className = 'intro'; intro.dataset.theme = theme.id;
       intro.style.backgroundImage = `url('${theme.poster}')`;
-      intro.innerHTML = `<video src="${theme.video}" poster="${theme.poster}" muted playsinline loop autoplay preload="auto"></video><div class="shade"></div><div class="txt"></div><div class="langs"></div><div class="scroll-hint">${T('scroll')}<i></i></div>`;
+      const wait = !opts.preview && !intro.dataset.go && !$('#env-screen')?.classList.contains('gone');
+      intro.innerHTML = `<video src="${theme.video}" poster="${theme.poster}" muted playsinline loop ${wait ? 'preload="none"' : 'autoplay preload="auto"'}></video><div class="shade"></div><div class="txt"></div><div class="langs"></div><div class="scroll-hint">${T('scroll')}<i></i></div>`;
       root.prepend(intro);
     }
     intro.classList.toggle('light-txt', isLight(d.textColor));
@@ -444,6 +445,8 @@
     document.body.classList.add('locked');
     $('#envelope').addEventListener('click', () => {
       if (!opts.preview) setSound(true);
+      // al tocco sulla busta parte il download del video del tema, che è pronto quando la busta si chiude
+      const iv = $('.intro video'); if (iv) { iv.preload = 'auto'; iv.play().catch(() => {}); }
       openEnvelope($('#inv'));
     });
   }

@@ -32,7 +32,7 @@ $name = trim(preg_replace('/\s+/', ' ', $inv['data']['details']['headline'] ?? '
   <span class="sp"></span>
   <span class="save-state" id="save-state"><i></i><span>Salvato</span></span>
   <?php if ($isAdmin): ?><a class="btn" href="/admin?p=inviti"><span class="lbl">Pannello admin</span></a>
-  <?php else: ?><a class="btn" href="/?esci=1"><span class="lbl">Esci</span></a><?php endif; ?>
+  <?php else: ?><a class="btn" href="/?esci=1" aria-label="Esci"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4"/></svg><span class="lbl">Esci</span></a><?php endif; ?>
   <a class="btn pri" href="/i/<?= h($inv['slug']) ?>" target="_blank" rel="noopener" id="open-inv">Apri invito</a>
 </header>
 
