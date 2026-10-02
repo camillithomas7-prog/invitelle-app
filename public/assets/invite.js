@@ -441,7 +441,8 @@
       S = data; opts = o || {}; lang = S.languages.main || 'it';
       const root = $('#inv');
       if (opts.preview) document.body.classList.add('preview');
-      document.body.insertAdjacentHTML('beforeend', `<div class="env-screen gone" id="env-screen"></div><button class="snd" id="snd" type="button" aria-label="Audio"></button>`);
+      if (!$('#env-screen')) document.body.insertAdjacentHTML('beforeend', `<div class="env-screen gone" id="env-screen"></div>`);
+      document.body.insertAdjacentHTML('beforeend', `<button class="snd" id="snd" type="button" aria-label="Audio"></button>`);
       $('#snd').addEventListener('click', () => setSound(!soundOn));
       root.addEventListener('change', e => { if (e.target.matches('[data-langsel]')) { lang = e.target.value; INV.loadLang(lang).then(() => paint(root)); } });
       root.addEventListener('click', e => {

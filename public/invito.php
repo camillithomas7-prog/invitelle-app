@@ -22,7 +22,13 @@ $theme = $d['theme'] ?? 'amalfi';
 <link rel="stylesheet" href="/assets/invite.css?v=<?= filemtime(__DIR__ . '/assets/invite.css') ?>">
 <link rel="stylesheet" href="/assets/fx.css?v=<?= filemtime(__DIR__ . '/assets/fx.css') ?>">
 </head>
-<body>
+<?php
+// la busta è già nella pagina dal primo istante (prima che parta il codice), così non si intravede mai il tema sotto
+$env = $d['envelope'] ?? [];
+$tplEnv = ($env['mode'] ?? '') === 'template' && preg_match('/^[a-z0-9-]+$/', $env['template'] ?? '') ? $env['template'] : '';
+?>
+<body<?= $preview ? '' : ' class="locked"' ?>>
+<?php if (!$preview): ?><div class="env-screen<?= $tplEnv ? ' full' : '' ?>" id="env-screen"><?php if ($tplEnv): ?><div class="env-full"><img src="/media/envelopes/<?= h($tplEnv) ?>.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></div><?php endif; ?></div><?php endif; ?>
 <main class="inv" id="inv"></main>
 <script src="/assets/catalog.js?v=<?= filemtime(__DIR__ . '/assets/catalog.js') ?>"></script>
 <script src="/assets/fx.js?v=<?= filemtime(__DIR__ . '/assets/fx.js') ?>"></script>
