@@ -162,8 +162,6 @@
       <div class="fx-mot">${motions.map(([v, t, d]) => `<button type="button" data-set="fx.motion" data-v="${v}" class="fxt ${m === v ? 'on' : ''}">
         <div class="fxt-pv mk mk-${v}" style="background-image:url('${theme.poster}')">${mock}${m === v ? `<span class="chk">${I.check}</span>` : ''}</div>
         <b>${t}</b><small>${d}</small></button>`).join('')}</div>
-      <h4 class="fx-h">Sorpresa finale</h4>
-      ${tog('cheers', 'Brindisi finale', 'In fondo all\'invito due calici si toccano e partono i fuochi d\'artificio', 'fx.toast')}
       <h4 class="fx-h" style="margin-top:26px">1. Atmosfera dell'apertura <small>sopra il video iniziale</small></h4>
       <div class="fx-par">${InvFx.MODES.map(x => `<button type="button" data-set="fx.particles" data-v="${x.id}" class="fxt ${p === x.id ? 'on' : ''}">
         <div class="fxt-pv" style="background-image:url('${theme.poster}')" data-atmos="${x.id}">${x.id === 'auto' ? `<span class="fxt-tag">${esc(auto?.name || '')}</span>` : ''}${p === x.id ? `<span class="chk">${I.check}</span>` : ''}</div>
@@ -371,7 +369,9 @@
       <div class="sec"><h3>Blocchi attivi</h3><p class="hint" style="margin:-6px 0 12px">Trascina per riordinare · Clicca per modificare · Occhio per nascondere</p>
         <div class="blocks" id="blocks">${list}</div>
         <div style="margin-top:14px"><button type="button" class="btn ${addOpen ? '' : 'pri'}" data-action="add-open">${I.plus} Aggiungi blocco</button></div>
-        ${addOpen ? `<div class="add-grid">${Object.entries(INV.blockTypes).map(([k, t]) => `<button type="button" data-action="add-block" data-t="${k}"><img src="/media/icons/icon-blk-${t.icon}.png" alt="">${t.name}</button>`).join('')}</div>` : ''}</div>`;
+        ${addOpen ? `<div class="add-grid">${Object.entries(INV.blockTypes).map(([k, t]) => `<button type="button" data-action="add-block" data-t="${k}"><img src="/media/icons/icon-blk-${t.icon}.png" alt="">${t.name}</button>`).join('')}</div>` : ''}</div>
+      <div class="sec"><h3>Finale dell'invito</h3><p class="hint" style="margin:-6px 0 12px">Dopo l'ultimo blocco e la conferma di presenza: monogramma, nomi e data.</p>
+        ${tog('cheers', 'Brindisi finale', 'Due calici si toccano sopra il monogramma e partono i fuochi d\'artificio', 'fx.toast')}</div>`;
   }
 
   // ---------- TAB: AUDIO ----------
@@ -693,6 +693,7 @@
     if (el.type === 'range') el.nextElementSibling.textContent = el.value + (el.nextElementSibling.textContent.endsWith('%') ? '%' : 'px');
     const structural = el.type === 'checkbox' || el.tagName === 'SELECT' || k === 'envelope.initials';
     changed(structural);
+    if (k === 'fx.toast') post({ view: 'finale' });
     if (k.startsWith('envelope')) post({ data: S, view: 'envelope' });
   });
 
