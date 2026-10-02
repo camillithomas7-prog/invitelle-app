@@ -63,6 +63,7 @@ $name = trim(preg_replace('/\s+/', ' ', $inv['data']['details']['headline'] ?? '
 <script src="/assets/qrcode.js"></script>
 <script src="/assets/album-panel.js?v=<?= $v('album-panel.js') ?>"></script>
 <script src="/assets/planner.js?v=<?= $v('planner.js') ?>"></script>
+<script src="/assets/fx.js?v=<?= $v('fx.js') ?>"></script>
 <script src="/assets/editor.js?v=<?= $v('editor.js') ?>"></script>
 </body>
 </html>

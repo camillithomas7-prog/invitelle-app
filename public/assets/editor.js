@@ -42,7 +42,7 @@
 
   let S = window.__INVITE.data;
   if (!S.blocksStyle.iconColor) S.blocksStyle.iconColor = '#a8864f';
-  S.fx = Object.assign({ motion: 'cinema', particles: 'auto' }, S.fx || {});
+  S.fx = Object.assign({ motion: 'cinema', particles: 'auto', amount: 'medium' }, S.fx || {});
   S.album = Object.assign({ cardStyle: 'avorio', enabled: true, askName: true, cardTitle: 'Condividi i tuoi scatti', cardText: 'Inquadra il codice e carica le foto e i video della festa' }, S.album || {});
   // aggiorna i blocchi "La nostra storia" creati con la versione precedente
   (S.blocks || []).filter(b => b.type === 'story').forEach(b => {
@@ -147,16 +147,33 @@
         <div class="meta"><b>${esc(t.name)}</b><small>${esc(t.desc)}</small></div></button>`).join('')}
         </div>${fxSec()}${paperSec()}`;
   }
-  // effetti dell'invito: animazioni e atmosfera sopra il video iniziale
+  // effetti dell'invito: animazioni e atmosfera sopra il video iniziale, con anteprime animate dal vivo
   function fxSec() {
-    const m = S.fx.motion, p = S.fx.particles;
-    const motions = [['cinema', 'Cinematiche', 'Titolo scritto a mano, video che si apre, blocchi in sequenza, linee che si disegnano'], ['soft', 'Delicate', 'Solo dissolvenze leggere'], ['none', 'Nessuna', 'Invito fermo']];
-    const parts = [['auto', 'Automatica', 'In base al tema'], ['oro', 'Polvere d\'oro', 'Bagliori dorati che salgono'], ['petali', 'Petali', 'Petali di rosa che cadono'], ['lucciole', 'Lucciole', 'Luci calde che danzano'], ['neve', 'Neve', 'Fiocchi leggeri'], ['none', 'Nessuna', '']];
-    const opt = (path, cur, [v, t, d]) => `<button type="button" data-set="${path}" data-v="${v}" class="fx-opt ${cur === v ? 'on' : ''}"><b>${t}</b>${d ? `<small>${d}</small>` : ''}</button>`;
-    return `<div class="sec" style="margin-top:26px"><h3>Effetti dell'invito</h3>
-      <p class="hint" style="margin:-6px 0 12px">Come si muove l'invito quando gli ospiti lo aprono e lo scorrono.</p>
-      <label class="l">Animazioni</label><div class="fx-opts">${motions.map(x => opt('fx.motion', m, x)).join('')}</div>
-      <label class="l" style="margin-top:14px">Atmosfera sopra il video</label><div class="fx-opts">${parts.map(x => opt('fx.particles', p, x)).join('')}</div></div>`;
+    const m = S.fx.motion, p = S.fx.particles, am = S.fx.amount || 'medium';
+    const theme = INV.themes.find(t => t.id === S.theme) || INV.themes[0];
+    const auto = InvFx.MODES.find(x => x.id === InvFx.pickMode({ particles: 'auto' }, S.theme)[0]);
+    const motions = [['cinema', 'Cinematiche', 'Titolo scritto a mano, blocchi che entrano in sequenza, linee che si disegnano'], ['soft', 'Delicate', 'Solo dissolvenze leggere'], ['none', 'Ferme', 'Nessuna animazione']];
+    const mock = `<i class="mk-t"></i><i class="mk-a"></i><i class="mk-t2"></i><i class="mk-d"></i><i class="mk-c"></i><i class="mk-c2"></i>`;
+    return `<div class="sec fx-sec" style="margin-top:26px"><h3>Effetti dell'invito</h3>
+      <p class="hint" style="margin:-6px 0 14px">Come prende vita l'invito quando gli ospiti lo aprono e lo scorrono. Le anteprime sono animate dal vivo sul tuo tema.</p>
+      <label class="l">Animazioni</label>
+      <div class="fx-mot">${motions.map(([v, t, d]) => `<button type="button" data-set="fx.motion" data-v="${v}" class="fxt ${m === v ? 'on' : ''}">
+        <div class="fxt-pv mk mk-${v}" style="background-image:url('${theme.poster}')">${mock}${m === v ? `<span class="chk">${I.check}</span>` : ''}</div>
+        <b>${t}</b><small>${d}</small></button>`).join('')}</div>
+      <label class="l" style="margin-top:18px">Atmosfera sopra il video</label>
+      <div class="fx-par">${InvFx.MODES.map(x => `<button type="button" data-set="fx.particles" data-v="${x.id}" class="fxt ${p === x.id ? 'on' : ''}">
+        <div class="fxt-pv" style="background-image:url('${theme.poster}')" data-atmos="${x.id}">${x.id === 'auto' ? `<span class="fxt-tag">${esc(auto?.name || '')}</span>` : ''}${p === x.id ? `<span class="chk">${I.check}</span>` : ''}</div>
+        <b>${x.name}</b><small>${x.id === 'auto' ? `Per questo tema: ${esc((auto?.name || '').toLowerCase())}` : x.desc}</small></button>`).join('')}</div>
+      ${p !== 'none' ? `<label class="l" style="margin-top:16px">Intensità</label><div class="seg">${[['light', 'Leggera'], ['medium', 'Media'], ['strong', 'Intensa']].map(([v, t]) => `<button type="button" data-set="fx.amount" data-v="${v}" class="${am === v ? 'on' : ''}">${t}</button>`).join('')}</div>` : ''}
+    </div>`;
+  }
+  // fa partire le particelle nelle anteprime della scheda Tema
+  function bindFxPreviews() {
+    panel.querySelectorAll('[data-atmos]').forEach(el => {
+      const a = new InvFx.Atmos(el, { cls: 'fxt-cv', scale: .85, minArea: .7 });
+      const [mode, cols] = InvFx.pickMode({ particles: el.dataset.atmos }, S.theme);
+      a.set(mode, cols, S.fx.amount || 'medium');
+    });
   }
   // colore di sfondo dell'invito (sotto l'animazione iniziale, dietro a tutti i blocchi)
   function paperSec() {
@@ -574,6 +591,7 @@
     window.scrollTo(0, y);
     if (fx) { const el = panel.querySelector(`[data-k="${CSS.escape(fx)}"]`); if (el && el.type !== 'checkbox') { el.focus(); if (el.setSelectionRange && el.type === 'text') el.setSelectionRange(el.value.length, el.value.length); } }
     bindDrag();
+    if (tab === 'theme' && window.InvFx) bindFxPreviews();
     if (tab === 'tools') Planner.bind(panel);
     if (tab === 'album') AlbumPanel.bind();
     if (tab === 'audio') initWave(); else stopStartAudio();
