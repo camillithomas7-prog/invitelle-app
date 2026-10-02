@@ -372,6 +372,7 @@
         <div class="flow">${INV.flowers.map(f => `<button type="button" data-set="blocksStyle.flowers" data-v="${f.id}" class="${bs.flowers === f.id ? 'on' : ''}"><div style="${f.img ? `background-image:url('${f.img}')` : ''}">${f.img ? '' : '✕'}</div>${f.name}</button>`).join('')}</div></div></div>
       <div class="sec"><h3>Blocchi attivi</h3><p class="hint" style="margin:-6px 0 12px">Trascina per riordinare · Clicca per modificare · Occhio per nascondere</p>
         <div class="blocks" id="blocks">${list}</div>
+        <button type="button" class="rsvp-link" data-tab="rsvp"><img src="/media/icons/icon-feat-guests.png" alt=""><span><b>${esc(S.rsvp.title || 'Conferma la tua presenza')}</b><small>Sempre in fondo all'invito · si modifica nella scheda RSVP</small></span><em>Modifica →</em></button>
         <div style="margin-top:14px"><button type="button" class="btn ${addOpen ? '' : 'pri'}" data-action="add-open">${I.plus} Aggiungi blocco</button></div>
         ${addOpen ? `<div class="add-grid">${Object.entries(INV.blockTypes).map(([k, t]) => `<button type="button" data-action="add-block" data-t="${k}"><img src="/media/icons/icon-blk-${t.icon}.png" alt="">${t.name}</button>`).join('')}</div>` : ''}</div>
       <div class="sec"><h3>Finale dell'invito</h3><p class="hint" style="margin:-6px 0 12px">Dopo l'ultimo blocco e la conferma di presenza: monogramma, nomi e data.</p>

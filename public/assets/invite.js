@@ -404,8 +404,8 @@
       setTimeout(() => env.classList.add('flap'), 380);
       setTimeout(() => env.classList.add('glow'), 900);
       setTimeout(() => env.classList.add('push'), 1250);
-      setTimeout(() => env.classList.add('fade'), 2350);
-      setTimeout(done, 3200);
+      setTimeout(() => env.classList.add('fade'), 1850);
+      setTimeout(done, 2450);
       return;
     }
     if (env.dataset.full) {
@@ -413,12 +413,15 @@
       if (env.classList.contains('open')) return;
       env.classList.add('open');
       const v = env.querySelector('video');
+      // si passa al tema appena il lembo è aperto (cut = secondo del video misurato per ogni busta), senza restare sulla busta aperta
+      const tpl = INV.envelopeTemplates.find(t => t.id === S.envelope.template) || {};
       let finished = false;
-      const fin = () => { if (!finished) { finished = true; done(); } };
-      v.addEventListener('timeupdate', () => { if (v.duration && v.currentTime > v.duration - .6) fin(); });
+      const fin = () => { if (!finished) { finished = true; scr.classList.add('quick'); done(); } };
+      const watch = () => { if (finished) return; const end = tpl.cut || (v.duration ? v.duration - .6 : 99); if (v.currentTime >= end) fin(); else requestAnimationFrame(watch); };
+      v.playbackRate = 1.2;
       v.addEventListener('ended', fin);
-      v.play().catch(fin);
-      setTimeout(fin, 9000);
+      v.play().then(() => requestAnimationFrame(watch)).catch(fin);
+      setTimeout(fin, 7000);
       return;
     }
     env.classList.add('open');

@@ -243,3 +243,6 @@
   .cd { gap: 7px; } .cd div { width: 64px; }
   .cheers { transform: scale(.9); }
 }
+
+/* uscita dalla busta: dissolvenza rapida verso il tema (il velo di luce dell'intro fa da raccordo) */
+.env-screen.full.quick { transition: opacity .45s ease, visibility 0s linear .45s; }
