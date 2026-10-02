@@ -246,3 +246,14 @@
 
 /* uscita dalla busta: dissolvenza rapida verso il tema (il velo di luce dell'intro fa da raccordo) */
 .env-screen.full.quick { transition: opacity .45s ease, visibility 0s linear .45s; }
+
+/* ---------- BORDI FLOREALI: i testi restano nello spazio libero tra i fiori ---------- */
+/* larghezza del fiore = min(19%, 100px); il blocco ha 30px di margine: il testo parte subito dopo il fiore */
+.has-flowers .blk:not(.photo) > :is(h2, .sub, p, .caps, .swatches, .iban, .day-tabs) {
+  margin-left: max(0px, calc(min(19%, 100px) - 24px)); margin-right: max(0px, calc(min(19%, 100px) - 24px)); }
+.has-flowers .blk:not(.photo) > h2 { text-shadow: 0 0 14px var(--paper), 0 0 6px var(--paper), 0 0 2px var(--paper); }
+.has-flowers .blk:not(.photo) > :is(.sub, p) { text-shadow: 0 0 8px var(--paper), 0 0 3px var(--paper); }
+.blk h2 { font-size: clamp(27px, 7.6vw, 34px); text-wrap: balance; }
+.blk .sub, .blk p { text-wrap: pretty; }
+@media (max-width: 420px) { .has-flowers .blk:not(.photo) > h2 { font-size: clamp(25px, 7vw, 32px); } }
+.has-flowers .rsvp label.f { text-shadow: 0 0 6px var(--paper), 0 0 2px var(--paper); }
