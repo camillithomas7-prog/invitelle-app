@@ -286,9 +286,11 @@
     if (S.rsvp.enabled) { parts.push(rsvpHTML()); vis.push({ type: 'rsvp', data: {} }); }
     const isPhoto = b => b && b.type === 'countdown' && b.data.image;
     // ornamento tra un blocco e l'altro (non accanto alle foto a tutta larghezza)
+    const keepFx = paper.querySelector(':scope > .atmos-body');   // l'atmosfera dei blocchi non riparte a ogni modifica
     paper.innerHTML = parts.map((h, i) => (i && !isPhoto(vis[i]) && !isPhoto(vis[i - 1]) ? ORN : '') + h).join('')
       + (fxMotion() === 'none' && !S.details.date ? '' : finaleHTML())
       + `<div class="foot">${T('madeWith')}</div>`;
+    if (keepFx) paper.prepend(keepFx);
     paper.querySelectorAll('.blk').forEach(b => [...b.children].filter(c => !c.classList.contains('fl') && !c.classList.contains('ph-bg')).forEach((c, k) => c.style.setProperty('--i', k)));
     bindRsvp(root);
     bindCarousels(root);

@@ -39,7 +39,7 @@
   // ---------- PARTICELLE ----------
   class Atmos {
     constructor(host, opt = {}) {
-      this.host = host; this.scale = opt.scale || 1; this.minArea = opt.minArea;
+      this.host = host; this.scale = opt.scale || 1; this.minArea = opt.minArea; this.light = !!opt.light;
       this.c = document.createElement('canvas'); this.c.className = opt.cls || 'atmos';
       host.appendChild(this.c);
       this.x = this.c.getContext('2d'); this.ps = []; this.mode = 'none'; this.on = false; this.vis = true; this.shoot = null;
@@ -126,11 +126,13 @@
       p.vx += (R() - .5) * .04; p.vy += (R() - .5) * .04; p.vx *= .98; p.vy *= .98; p.x += p.vx; p.y += p.vy;
       if (p.x < -10) p.x = w + 10; if (p.x > w + 10) p.x = -10; if (p.y < -10) p.y = h + 10; if (p.y > h + 10) p.y = -10;
       const a = Math.max(0, Math.sin(p.t * p.tw * 60)) * .9;
-      this.glow(x, p.x, p.y, p.r * 6, a, '255,240,170', '255,214,110');
+      this.glow(x, p.x, p.y, p.r * 6, a, this.light ? '226,176,74' : '255,240,170', this.light ? '214,160,60' : '255,214,110');
+      if (this.light) { x.fillStyle = `rgba(190,138,40,${a})`; x.beginPath(); x.arc(p.x, p.y, p.r * .7, 0, TAU); x.fill(); }
     }
     neve(x, p, w, h) {
       p.x += p.vx + Math.sin(p.t * .8 + p.r) * .35; p.y += p.vy;
-      this.glow(x, p.x, p.y, p.r * 1.8, .55 + p.r / 8, '255,255,255', '255,255,255');
+      if (this.light) { this.glow(x, p.x, p.y, p.r * 2.2, .55 + p.r / 10, '150,170,198', '190,205,225'); x.fillStyle = 'rgba(255,255,255,.9)'; x.beginPath(); x.arc(p.x, p.y, p.r * .6, 0, TAU); x.fill(); }
+      else this.glow(x, p.x, p.y, p.r * 1.8, .55 + p.r / 8, '255,255,255', '255,255,255');
       return p.y > h + 10;
     }
     cuori(x, p, w, h) {
@@ -145,8 +147,9 @@
     }
     stelle(x, p, w, h) {
       const a = .25 + (Math.sin(p.t * p.tw) * .5 + .5) * .75;
-      this.glow(x, p.x, p.y, p.r * 3, a * .9, '255,255,255', '220,230,255');
-      if (p.big) this.sparkle(x, p.x, p.y, p.r * 5 * a, a * .9, '255,255,255');
+      const c = this.light ? '196,152,64' : '255,255,255';
+      this.glow(x, p.x, p.y, p.r * 3, a * .9, c, this.light ? '214,180,110' : '220,230,255');
+      if (p.big || this.light) this.sparkle(x, p.x, p.y, p.r * (p.big ? 5 : 3) * a, a * .9, c);
     }
     shooting(x, w, h) {
       if (!this.shoot && R() < .006) this.shoot = { x: w * (.3 + R() * .7), y: R() * h * .35, v: 7 + R() * 5, life: 0 };
@@ -154,7 +157,7 @@
       s.life += 1; s.x -= s.v; s.y += s.v * .45;
       const a = Math.max(0, 1 - s.life / 45);
       const g = x.createLinearGradient(s.x, s.y, s.x + 70, s.y - 32); g.addColorStop(0, `rgba(255,255,255,${a})`); g.addColorStop(1, 'rgba(255,255,255,0)');
-      x.strokeStyle = g; x.lineWidth = 1.6 * this.scale; x.beginPath(); x.moveTo(s.x, s.y); x.lineTo(s.x + 70, s.y - 32); x.stroke();
+      x.strokeStyle = this.light ? `rgba(196,152,64,${a})` : g; x.lineWidth = 1.6 * this.scale; x.beginPath(); x.moveTo(s.x, s.y); x.lineTo(s.x + 70, s.y - 32); x.stroke();
       if (a <= 0) this.shoot = null;
     }
     foglie(x, p, w, h) {
@@ -266,6 +269,18 @@
         if (!intro.atmos) intro.atmos = new Atmos(intro);
         const [m, cols] = pickMode(fx, S.theme);
         intro.atmos.set(motion === 'none' ? 'none' : m, cols, fx.amount);
+      }
+      // atmosfera dentro l'invito: livello fermo sullo schermo dietro ai blocchi (none | same | effetto)
+      const paper = r.querySelector('.paper');
+      if (paper) {
+        let host = paper.querySelector(':scope > .atmos-body');
+        if (!host) { host = document.createElement('div'); host.className = 'atmos-body'; paper.prepend(host); }
+        const bg = (S.blocksStyle || {}).bg || '#fbf8f2', n = parseInt(bg.slice(1), 16);
+        const light = ((n >> 16) * .299 + (n >> 8 & 255) * .587 + (n & 255) * .114) > 150;
+        if (!host.atmos || host.atmos.light !== light) { host.atmos?.destroy(); host.querySelector('canvas')?.remove(); host.atmos = new Atmos(host, { light, cls: 'atmos atmos-b' }); }
+        const b = fx.body || 'none';
+        const [bm, bc] = b === 'same' ? pickMode(fx, S.theme) : pickMode({ particles: b }, S.theme);
+        host.atmos.set(motion === 'none' || b === 'none' ? 'none' : bm, bc, b === 'same' ? (fx.bodyAmount || fx.amount) : fx.bodyAmount);
         splitLines(intro.querySelector('.txt'));
       }
       r.querySelectorAll('.car-track').forEach(t => {

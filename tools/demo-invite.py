@@ -7,7 +7,7 @@ M = '/media/demo/'
 def b(t, data, accent='', icon=1): return {'id': uid(), 'type': t, 'visible': True, 'accent': accent, 'icon': icon, 'data': data}
 D = {
   'theme': 'mare',
-  'fx': {'motion': 'cinema', 'particles': 'auto'},
+  'fx': {'motion': 'cinema', 'particles': 'cuori', 'amount': 'medium', 'body': 'stelle', 'bodyAmount': 'light'},
   'envelope': {'mode': 'template', 'template': 'riviera', 'initials': 'S & A', 'style': 'ceralacca', 'color': 'crema', 'seal': 'rosso'},
   'details': {'date': '2027-06-19', 'endDate': '', 'dateSize': 19, 'datePos': 'below', 'headline': 'Stefania\n&\nAngelo\n\nsposi',
               'headlineFont': 'Playfair Display', 'headlineSize': 34, 'textColor': '#2e2420'},

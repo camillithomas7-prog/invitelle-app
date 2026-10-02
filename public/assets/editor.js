@@ -42,7 +42,7 @@
 
   let S = window.__INVITE.data;
   if (!S.blocksStyle.iconColor) S.blocksStyle.iconColor = '#a8864f';
-  S.fx = Object.assign({ motion: 'cinema', particles: 'auto', amount: 'medium' }, S.fx || {});
+  S.fx = Object.assign({ motion: 'cinema', particles: 'auto', amount: 'medium', body: 'none', bodyAmount: 'light' }, S.fx || {});
   S.album = Object.assign({ cardStyle: 'avorio', enabled: true, askName: true, cardTitle: 'Condividi i tuoi scatti', cardText: 'Inquadra il codice e carica le foto e i video della festa' }, S.album || {});
   // aggiorna i blocchi "La nostra storia" creati con la versione precedente
   (S.blocks || []).filter(b => b.type === 'story').forEach(b => {
@@ -160,19 +160,41 @@
       <div class="fx-mot">${motions.map(([v, t, d]) => `<button type="button" data-set="fx.motion" data-v="${v}" class="fxt ${m === v ? 'on' : ''}">
         <div class="fxt-pv mk mk-${v}" style="background-image:url('${theme.poster}')">${mock}${m === v ? `<span class="chk">${I.check}</span>` : ''}</div>
         <b>${t}</b><small>${d}</small></button>`).join('')}</div>
-      <label class="l" style="margin-top:18px">Atmosfera sopra il video</label>
+      <h4 class="fx-h">1. Atmosfera dell'apertura <small>sopra il video iniziale</small></h4>
       <div class="fx-par">${InvFx.MODES.map(x => `<button type="button" data-set="fx.particles" data-v="${x.id}" class="fxt ${p === x.id ? 'on' : ''}">
         <div class="fxt-pv" style="background-image:url('${theme.poster}')" data-atmos="${x.id}">${x.id === 'auto' ? `<span class="fxt-tag">${esc(auto?.name || '')}</span>` : ''}${p === x.id ? `<span class="chk">${I.check}</span>` : ''}</div>
         <b>${x.name}</b><small>${x.id === 'auto' ? `Per questo tema: ${esc((auto?.name || '').toLowerCase())}` : x.desc}</small></button>`).join('')}</div>
-      ${p !== 'none' ? `<label class="l" style="margin-top:16px">Intensità</label><div class="seg">${[['light', 'Leggera'], ['medium', 'Media'], ['strong', 'Intensa']].map(([v, t]) => `<button type="button" data-set="fx.amount" data-v="${v}" class="${am === v ? 'on' : ''}">${t}</button>`).join('')}</div>` : ''}
+      ${p !== 'none' ? `<label class="l" style="margin-top:16px">Intensità</label>${amountSeg('fx.amount', am)}` : ''}
+      ${bodySec(theme)}
     </div>`;
+  }
+  const amountSeg = (path, cur) => `<div class="seg">${[['light', 'Leggera'], ['medium', 'Media'], ['strong', 'Intensa']].map(([v, t]) => `<button type="button" data-set="${path}" data-v="${v}" class="${cur === v ? 'on' : ''}">${t}</button>`).join('')}</div>`;
+  // atmosfera dentro l'invito (dietro ai blocchi): nessuna, uguale all'apertura o un'altra
+  function bodySec(theme) {
+    const b = S.fx.body || 'none', other = !['none', 'same'].includes(b);
+    const bg = isHex(S.blocksStyle.bg) ? S.blocksStyle.bg : '#fbf8f2', ink = S.blocksStyle.color || '#3a2e28';
+    const introMode = InvFx.pickMode(S.fx, S.theme)[0];
+    const firstOther = (InvFx.MODES.find(x => !['auto', 'none', introMode].includes(x.id)) || {}).id;
+    const paperPv = (mode, extra = '') => `<div class="fxt-pv fxt-paper" style="background-color:${bg};--ink:${ink}" data-atmos="${mode}" data-body="1">
+      <i class="pp-ic"></i><i class="pp-t"></i><i class="pp-l"></i><i class="pp-l s"></i><i class="pp-c"></i>${extra}</div>`;
+    const opt = (v, t, d, mode) => `<button type="button" data-set="fx.body" data-v="${v}" class="fxt ${(v === b || (v === firstOther && other)) ? 'on' : ''}">
+      ${paperPv(mode, (v === b || (v === firstOther && other)) ? `<span class="chk">${I.check}</span>` : '')}<b>${t}</b><small>${d}</small></button>`;
+    return `<h4 class="fx-h" style="margin-top:26px">2. Atmosfera dentro l'invito <small>dietro a tutti i blocchi, mentre si scorre</small></h4>
+      <div class="fx-mot">${opt('none', 'Nessuna', 'Blocchi puliti', 'none')}${opt('same', 'Uguale all\'apertura', 'Lo stesso effetto continua', 'same')}${opt(other ? b : firstOther, 'Un\'altra', 'Scegli un effetto diverso', other ? b : firstOther)}</div>
+      ${other ? `<label class="l" style="margin-top:16px">Quale atmosfera dentro l'invito</label>
+      <div class="fx-par">${InvFx.MODES.filter(x => !['auto', 'none'].includes(x.id)).map(x => `<button type="button" data-set="fx.body" data-v="${x.id}" class="fxt ${b === x.id ? 'on' : ''}">
+        ${paperPv(x.id, b === x.id ? `<span class="chk">${I.check}</span>` : '')}<b>${x.name}</b></button>`).join('')}</div>` : ''}
+      ${b !== 'none' ? `<label class="l" style="margin-top:16px">Intensità dentro l'invito</label>${amountSeg('fx.bodyAmount', S.fx.bodyAmount || 'light')}
+      <p class="hint" style="margin-top:8px">Dentro l'invito l'effetto resta dietro ai testi; su uno sfondo chiaro stelle, neve e lucciole diventano dorate per restare visibili.</p>` : ''}`;
   }
   // fa partire le particelle nelle anteprime della scheda Tema
   function bindFxPreviews() {
     panel.querySelectorAll('[data-atmos]').forEach(el => {
       const a = new InvFx.Atmos(el, { cls: 'fxt-cv', scale: .85, minArea: .7 });
-      const [mode, cols] = InvFx.pickMode({ particles: el.dataset.atmos }, S.theme);
-      a.set(mode, cols, S.fx.amount || 'medium');
+      const body = !!el.dataset.body, id = el.dataset.atmos;
+      if (body) { const bg = S.blocksStyle.bg || '#fbf8f2', n = parseInt(bg.slice(1), 16); a.light = ((n >> 16) * .299 + (n >> 8 & 255) * .587 + (n & 255) * .114) > 150; }
+      const [mode, cols] = id === 'same' ? InvFx.pickMode(S.fx, S.theme) : InvFx.pickMode({ particles: id }, S.theme);
+      a.set(mode, cols, body ? (S.fx.bodyAmount || 'light') : (S.fx.amount || 'medium'));
     });
   }
   // colore di sfondo dell'invito (sotto l'animazione iniziale, dietro a tutti i blocchi)
