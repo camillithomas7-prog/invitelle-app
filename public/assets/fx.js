@@ -276,6 +276,88 @@
     })(t0);
   }
 
+  // ---------- GRATTA E SCOPRI LA DATA ----------
+  // patina dorata sopra la data: si gratta col dito, oltre metà si scopre tutto con una pioggia di coriandoli
+  function scratch(el, o = {}) {
+    if (!el || el.querySelector('canvas.scr-cv')) return;
+    const c = document.createElement('canvas'); c.className = 'scr-cv';
+    el.classList.add('scr'); el.appendChild(c);
+    const x = c.getContext('2d'), dpr = Math.min(devicePixelRatio || 1, 2);
+    let W = 0, H = 0, done = false, moves = 0, last = null;
+    const paint = () => {
+      W = c.offsetWidth; H = c.offsetHeight; if (!W || !H) return false;
+      c.width = W * dpr; c.height = H * dpr; x.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const g = x.createLinearGradient(0, 0, W, H);
+      g.addColorStop(0, '#b5873a'); g.addColorStop(.28, '#f1dca0'); g.addColorStop(.5, '#c99a48'); g.addColorStop(.72, '#f6e4b0'); g.addColorStop(1, '#a87b30');
+      x.fillStyle = g; x.beginPath(); x.roundRect ? x.roundRect(0, 0, W, H, H / 2) : x.rect(0, 0, W, H); x.fill();
+      // grana metallica
+      for (let i = 0; i < W * H / 14; i++) { x.fillStyle = R() < .5 ? 'rgba(255,255,255,.18)' : 'rgba(90,60,20,.12)'; x.fillRect(R() * W, R() * H, 1, 1); }
+      x.strokeStyle = 'rgba(255,248,225,.7)'; x.lineWidth = 1; x.beginPath(); x.roundRect ? x.roundRect(2.5, 2.5, W - 5, H - 5, (H - 5) / 2) : x.rect(2.5, 2.5, W - 5, H - 5); x.stroke();
+      x.fillStyle = '#5a3f17'; x.font = `600 ${Math.max(10, Math.min(13, H * .3))}px Montserrat, sans-serif`; x.textAlign = 'center'; x.textBaseline = 'middle';
+      if ('letterSpacing' in x) x.letterSpacing = '3px';
+      x.fillText((o.label || 'Gratta qui').toUpperCase(), W / 2 + 8, H / 2 + 1);
+      x.drawImage(sparkSpr('90,63,23'), W / 2 - x.measureText((o.label || 'Gratta qui').toUpperCase()).width / 2 - 14, H / 2 - 6, 12, 12);
+      return true;
+    };
+    if (!paint()) requestAnimationFrame(paint);
+    const pos = e => { const r = c.getBoundingClientRect(); return [(e.clientX - r.left) * (W / r.width), (e.clientY - r.top) * (H / r.height)]; };
+    const cleared = () => {
+      const d = x.getImageData(0, 0, c.width, c.height).data; let n = 0, t = 0;
+      for (let i = 3; i < d.length; i += 4 * 6) { t++; if (d[i] < 100) n++; }
+      return n / t;
+    };
+    const reveal = () => {
+      if (done) return; done = true;
+      el.classList.add('scr-done');
+      setTimeout(() => { c.remove(); el.classList.remove('scr'); }, 900);
+      burst(el, ['#d9b779', '#f3dfb4', '#ffffff', '#c99a48', '#e8b7b9']);
+      o.onDone && o.onDone();
+    };
+    const scr = e => {
+      if (done) return;
+      const [px, py] = pos(e);
+      x.globalCompositeOperation = 'destination-out'; x.lineCap = 'round'; x.lineJoin = 'round'; x.lineWidth = Math.max(18, H * .55);
+      x.beginPath(); x.moveTo(...(last || [px - .1, py])); x.lineTo(px, py); x.stroke();
+      x.globalCompositeOperation = 'source-over'; last = [px, py];
+      if (++moves % 5 === 0 && cleared() > .5) reveal();
+    };
+    c.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); c.setPointerCapture?.(e.pointerId); el.classList.add('scr-on'); last = null; scr(e); });
+    c.addEventListener('pointermove', e => { if (e.buttons || e.pointerType === 'touch') scr(e); });
+    c.addEventListener('pointerup', () => { last = null; if (!done && cleared() > .45) reveal(); });
+    addEventListener('resize', () => { if (!done) { last = null; paint(); } });
+  }
+
+  // ---------- BRINDISI FINALE: calici che si toccano e fuochi d'artificio ----------
+  function fireworks(host, light) {
+    if (reduce || host.querySelector('canvas.fw')) return;
+    const c = document.createElement('canvas'); c.className = 'fw'; host.prepend(c);
+    const dpr = Math.min(devicePixelRatio || 1, mobile ? 1.5 : 2), W = host.offsetWidth, H = host.offsetHeight;
+    c.width = W * dpr; c.height = H * dpr; const x = c.getContext('2d');
+    const sprs = light
+      ? [glowSpr('255,226,160', '214,168,80', '196,150,62'), glowSpr('242,170,180', '217,102,122', '200,90,110'), glowSpr('255,236,200', '226,190,120', '210,170,90')]
+      : [glowSpr('255,240,200', '255,214,110'), glowSpr('255,200,210', '240,140,160'), glowSpr('255,255,255', '230,235,255')];
+    const ps = [], t0 = performance.now();
+    const shells = [[1150, .5, .12], [1700, .2, .22], [2150, .8, .2], [2700, .34, .4], [3150, .68, .44], [3700, .5, .26]];
+    let si = 0, lastT = t0;
+    (function tick(now) {
+      if (!c.isConnected) return;
+      const el = now - t0, k = Math.min(3, (now - lastT) / 16.7); lastT = now;
+      while (si < shells.length && el >= shells[si][0]) {
+        const [, fx, fy] = shells[si++], cx = W * fx, cy = H * fy, spr = sprs[(R() * sprs.length) | 0], n = mobile ? 36 : 52;
+        const vmax = 3.6 + R() * 1.6;
+        for (let i = 0; i < n; i++) { const a = (i / n) * TAU + R() * .25, v = vmax * (.35 + Math.sqrt(R()) * .65); ps.push({ x: cx, y: cy, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, dec: .009 + R() * .008, spr, r: 2.6 + R() * 2.8, tw: R() * TAU }); }
+      }
+      x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
+      for (let i = ps.length - 1; i >= 0; i--) {
+        const p = ps[i]; p.vx *= Math.pow(.955, k); p.vy = p.vy * Math.pow(.955, k) + .03 * k; p.x += p.vx * k; p.y += p.vy * k; p.life -= p.dec * k;
+        if (p.life <= 0) { ps.splice(i, 1); continue; }
+        p.tw += .5 * k; x.globalAlpha = p.life * (p.life < .45 ? .55 + Math.sin(p.tw) * .45 : 1); x.drawImage(p.spr, p.x - p.r * 2, p.y - p.r * 2, p.r * 4, p.r * 4);
+        x.globalAlpha = p.life * .35; x.drawImage(p.spr, p.x - p.vx * 3 - p.r, p.y - p.vy * 3 - p.r, p.r * 2, p.r * 2);
+      }
+      if (si < shells.length || ps.length) requestAnimationFrame(tick); else c.remove();
+    })(t0);
+  }
+
   // ---------- titolo: ogni riga si "scrive" da sinistra a destra ----------
   function splitLines(txt) {
     txt.querySelectorAll('.hl > div').forEach((d, i) => { d.style.setProperty('--li', i); d.classList.add('ink'); });
@@ -311,6 +393,12 @@
       }
       if (intro) splitLines(intro.querySelector('.txt'));
       cache = null; requestAnimationFrame(measure);
+      const fin = r.querySelector('.finale.has-cheers');
+      if (fin && !r.closest('.preview') && !document.body.classList.contains('preview') && 'IntersectionObserver' in window) {
+        const bg = (S.blocksStyle || {}).bg || '#fbf8f2', n = parseInt(bg.slice(1), 16), light = ((n >> 16) * .299 + (n >> 8 & 255) * .587 + (n & 255) * .114) > 150;
+        const io = new IntersectionObserver(es => { if (es[0].isIntersecting) { io.disconnect(); fin.classList.add('toast'); if (motion !== 'none') fireworks(fin, light); } }, { threshold: .55 });
+        io.observe(fin);
+      }
       r.querySelectorAll('.paper img').forEach(img => { if (!img.complete) img.addEventListener('load', () => { cache = null; onScroll(); }, { once: true }); });
       r.querySelectorAll('.car-track').forEach(t => {
         coverflow(t);
@@ -319,7 +407,7 @@
       if (!window.__fxScroll) { window.__fxScroll = 1; addEventListener('scroll', onScroll, { passive: true }); addEventListener('resize', () => { cache = null; onScroll(); }); addEventListener('load', () => { cache = null; onScroll(); }); }
       onScroll();
     },
-    burst,
+    burst, scratch, fireworks,
     Atmos, MODES, pickMode,
     update: () => { cache = null; frame(); },
   };

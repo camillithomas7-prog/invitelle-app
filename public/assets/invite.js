@@ -10,7 +10,7 @@
   let S = null;          // stato corrente (dati invito)
   let opts = {};         // { slug, preview, token }
   let lang = 'it';
-  let audio = null, soundOn = false, cdTimer = null, guest = null;
+  let audio = null, soundOn = false, cdTimer = null, guest = null, scratched = false;
 
   const T = k => (INV.i18n[lang] || INV.i18n.en)[k] || INV.i18n.en[k] || INV.i18n.it[k] || k;
   const dietName = id => lang === 'it' ? (INV.diets.find(d => d.id === id) || {}).it : ((INV.dietNames[lang] || {})[id] || INV.dietNames.en[id]);
@@ -64,7 +64,7 @@
   function introTextHTML() {
     const d = S.details;
     const hl = `<div class="hl" style="font-size:${d.headlineSize}px">${(d.headline || '').split('\n').map(l => `<div>${esc(l)}</div>`).join('')}</div>`;
-    const dt = d.date ? `<div class="date" style="font-size:${d.dateSize}px">${esc(dateText())}</div>` : '';
+    const dt = d.date ? `<div class="date" style="font-size:${d.dateSize}px"><span class="dt">${esc(dateText())}</span></div>` : '';
     return d.datePos === 'above' ? dt + hl : hl + dt;
   }
 
@@ -80,7 +80,12 @@
     const n = coupleNames();
     const ini = n ? `${n[0][0]} & ${n[1][0]}` : (S.envelope.initials || '');
     const leaf = (x, y, r) => `<path class="lf" transform="rotate(${r} ${x} ${y})" d="M${x} ${y}c3-4 8-4 10 0-3 4-8 4-10 0z"/>`;
-    return `<section class="finale reveal" data-block="finale"><div class="ring"><svg viewBox="0 0 148 148">
+    const toast = (S.fx || {}).toast !== false;
+    const glass = side => `<svg class="gl gl-${side}" viewBox="0 0 40 110"><defs><linearGradient id="champ-${side}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbe9b7"/><stop offset="1" stop-color="#e2b75c"/></linearGradient></defs>
+      <path class="gl-fill" fill="url(#champ-${side})" d="M11.7 15H28.3C28.8 30 27 44.5 20 49.6 13 44.5 11.2 30 11.7 15Z"/>
+      <circle class="bb" cx="17" cy="42" r="1"/><circle class="bb b2" cx="22" cy="44" r=".8"/><circle class="bb b3" cx="19.5" cy="40" r=".7"/>
+      <path class="gl-glass" d="M11 4H29C30 26 28 46 20 52 12 46 10 26 11 4Z"/><path class="gl-stem" d="M20 52V96M10 98.5C14 96.6 26 96.6 30 98.5"/></svg>`;
+    return `<section class="finale reveal ${toast ? 'has-cheers' : ''}" data-block="finale">${toast ? `<div class="cheers" aria-hidden="true">${glass('l')}${glass('r')}<i class="clink"></i></div>` : ''}<div class="ring"><svg viewBox="0 0 148 148">
       <circle pathLength="1" cx="74" cy="74" r="66" transform="rotate(-90 74 74)"/><circle class="c2" pathLength="1" cx="74" cy="74" r="60" transform="rotate(90 74 74)"/>
       ${leaf(64, 140, 0)}${leaf(74, 140, 180)}${leaf(64, 8, 0)}${leaf(74, 8, 180)}</svg><div class="mono">${esc(ini)}</div></div>
       ${n ? `<div class="fin-names">${esc(n[0])} &amp; ${esc(n[1])}</div>` : ''}<p class="fin-t">${esc(T('seeYou'))}</p>${S.details.date ? `<div class="fin-d">${esc(dateText())}</div>` : ''}</section>`;
@@ -297,6 +302,13 @@
     tickCountdown(root);
     observeReveal(root);
     if (window.InvFx) InvFx.apply(root, S);
+    // gratta e scopri la data (una volta scoperta resta scoperta, anche alle visite successive)
+    const sk = 'inv-scr-' + opts.slug;
+    try { if (!opts.preview && localStorage.getItem(sk)) scratched = true; } catch (e) {}
+    if ((S.fx || {}).scratch && !scratched && window.InvFx) {
+      const dt = $('.intro .date .dt', root);
+      if (dt) requestAnimationFrame(() => InvFx.scratch(dt, { label: T('scratch'), onDone: () => { scratched = true; try { if (!opts.preview) localStorage.setItem(sk, '1'); } catch (e) {} } }));
+    }
   }
   const fxMotion = () => (window.InvFx && InvFx.reduce) ? 'none' : ((S.fx || {}).motion || 'cinema');
 

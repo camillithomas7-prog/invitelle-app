@@ -190,3 +190,43 @@
   .inv *, .inv *::before, .inv *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
 .preview .orn path:not(.dm) { stroke-dashoffset: 0; }
+
+/* ---------- GRATTA E SCOPRI LA DATA ---------- */
+.intro .date .dt { position: relative; display: inline-block; }
+.fx-cinema .intro .date:has(.scr) { gap: 28px; }
+.dt.scr { min-width: 170px; text-align: center; }
+.scr-cv { position: absolute; z-index: 1; left: -16px; top: -9px; width: calc(100% + 32px); height: calc(100% + 18px); border-radius: 99px; touch-action: none; cursor: grab;
+  box-shadow: 0 6px 18px rgba(110,72,20,.32), inset 0 0 0 1px rgba(255,255,255,.3); transition: opacity .8s ease, transform .8s ease; }
+.dt.scr::after { content: ''; position: absolute; z-index: 2; left: -16px; top: -9px; width: calc(100% + 32px); height: calc(100% + 18px); border-radius: 99px; pointer-events: none;
+  background: linear-gradient(110deg, transparent 38%, rgba(255,255,255,.6) 50%, transparent 62%) no-repeat; background-size: 260% 100%; animation: scr-sheen 2.8s ease-in-out infinite; }
+.dt.scr-on::after, .dt.scr-done::after { display: none; }
+.dt.scr:not(.scr-on) .scr-cv { animation: scr-nudge 4.5s ease-in-out 3.5s infinite; }
+@keyframes scr-sheen { 0% { background-position: 130% 0; } 60%, 100% { background-position: -30% 0; } }
+@keyframes scr-nudge { 0%, 88%, 100% { transform: none; } 91% { transform: rotate(-2.5deg) scale(1.04); } 94% { transform: rotate(2.5deg) scale(1.04); } 97% { transform: rotate(-1deg); } }
+.dt.scr-done .scr-cv { opacity: 0; transform: scale(1.18); animation: none; }
+.dt.scr-done { animation: dt-glow 1.8s ease; }
+@keyframes dt-glow { 0% { text-shadow: 0 0 0 rgba(232,196,120,0); } 35% { text-shadow: 0 0 18px rgba(232,196,120,.95), 0 0 2px #fff; } 100% { text-shadow: inherit; } }
+
+/* ---------- BRINDISI FINALE ---------- */
+.finale .fw { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+.finale > :not(.fw) { position: relative; z-index: 1; }
+.cheers { position: relative; width: 170px; height: 118px; margin: 0 auto 24px; }
+.cheers .gl { position: absolute; bottom: 0; width: 42px; height: 116px; overflow: visible; color: var(--accent); transform-origin: 50% 92%; }
+.gl-glass { fill: rgba(255,255,255,.28); stroke: currentColor; stroke-width: 1.1; }
+.gl-stem { fill: none; stroke: currentColor; stroke-width: 1.1; stroke-linecap: round; }
+.gl .bb { fill: #fff; opacity: .85; animation: fx-bb 2.4s ease-in infinite; }
+.gl .bb.b2 { animation-delay: .8s; } .gl .bb.b3 { animation-delay: 1.5s; }
+@keyframes fx-bb { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: .9; } 100% { transform: translateY(-24px); opacity: 0; } }
+.gl-l { left: calc(50% - 55px); transform: rotate(14deg); }
+.gl-r { right: calc(50% - 55px); transform: rotate(-14deg); }
+.cheers .clink { position: absolute; left: 50%; top: -6px; width: 30px; height: 30px; margin-left: -15px; transform: scale(0); pointer-events: none;
+  background: radial-gradient(circle, #fffaf0 0 22%, rgba(236,200,120,.9) 40%, rgba(236,200,120,0) 72%);
+  clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%); }
+.fx-cinema .finale.has-cheers:not(.toast) .gl { opacity: 0; }
+.fx-cinema .finale.toast .gl-l { animation: gl-l 1.5s cubic-bezier(.3,.1,.2,1) both; }
+.fx-cinema .finale.toast .gl-r { animation: gl-r 1.5s cubic-bezier(.3,.1,.2,1) both; }
+.fx-cinema .finale.toast .clink { animation: fx-clink 1s ease-out 1.02s both; }
+@keyframes gl-l { 0% { transform: translateX(-70px) rotate(-8deg); opacity: 0; } 25% { opacity: 1; } 68% { transform: translateX(3px) rotate(16deg); } 80% { transform: translateX(-3px) rotate(11deg); } 100% { transform: rotate(14deg); opacity: 1; } }
+@keyframes gl-r { 0% { transform: translateX(70px) rotate(8deg); opacity: 0; } 25% { opacity: 1; } 68% { transform: translateX(-3px) rotate(-16deg); } 80% { transform: translateX(3px) rotate(-11deg); } 100% { transform: rotate(-14deg); opacity: 1; } }
+@keyframes fx-clink { 0% { transform: scale(0) rotate(0); opacity: 1; } 40% { transform: scale(1.5) rotate(45deg); opacity: 1; } 100% { transform: scale(.2) rotate(90deg); opacity: 0; } }
+.preview .finale .gl { opacity: 1 !important; animation: none !important; }

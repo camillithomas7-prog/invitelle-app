@@ -37,12 +37,14 @@
     check: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>',
     play: '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4v16l13-8z"/></svg>',
     pause: '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>',
+    scratch: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3" y="7" width="18" height="10" rx="5"/><path d="M8 13.5l3-3M11 14l4-4.5M14.5 14l2-2.2"/></svg>',
+    cheers: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h5l-.4 5.5A2.6 2.6 0 0 1 7 11a2.6 2.6 0 0 1-2.6-2.5zM7 11v8M4.5 21h5M14 3h5l.6 5.5A2.6 2.6 0 0 1 17 11a2.6 2.6 0 0 1-2.6-2.5zM17 11v8M14.5 21h5"/><path d="M12 2.5v1.5M10.5 5l-1-.8M13.5 5l1-.8"/></svg>',
     wa: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5 2.5 1 3 .8 3.6.7.6-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.2-.3-.2-.6-.4zM12 21.8a9.8 9.8 0 0 1-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 1 1 12 21.8zM12 0a12 12 0 0 0-10.3 18L0 24l6.2-1.6A12 12 0 1 0 12 0z"/></svg>',
   };
 
   let S = window.__INVITE.data;
   if (!S.blocksStyle.iconColor) S.blocksStyle.iconColor = '#a8864f';
-  S.fx = Object.assign({ motion: 'cinema', particles: 'auto', amount: 'medium', body: 'none', bodyAmount: 'light' }, S.fx || {});
+  S.fx = Object.assign({ motion: 'cinema', particles: 'auto', amount: 'medium', body: 'none', bodyAmount: 'light', scratch: false, toast: true }, S.fx || {});
   S.album = Object.assign({ cardStyle: 'avorio', enabled: true, askName: true, cardTitle: 'Condividi i tuoi scatti', cardText: 'Inquadra il codice e carica le foto e i video della festa' }, S.album || {});
   // aggiorna i blocchi "La nostra storia" creati con la versione precedente
   (S.blocks || []).filter(b => b.type === 'story').forEach(b => {
@@ -160,7 +162,10 @@
       <div class="fx-mot">${motions.map(([v, t, d]) => `<button type="button" data-set="fx.motion" data-v="${v}" class="fxt ${m === v ? 'on' : ''}">
         <div class="fxt-pv mk mk-${v}" style="background-image:url('${theme.poster}')">${mock}${m === v ? `<span class="chk">${I.check}</span>` : ''}</div>
         <b>${t}</b><small>${d}</small></button>`).join('')}</div>
-      <h4 class="fx-h">1. Atmosfera dell'apertura <small>sopra il video iniziale</small></h4>
+      <h4 class="fx-h">Sorprese per gli ospiti</h4>
+      ${tog('scratch', 'Gratta e scopri la data', 'La data è coperta da una patina dorata: gli ospiti la grattano col dito e parte una pioggia di coriandoli', 'fx.scratch')}
+      ${tog('cheers', 'Brindisi finale', 'In fondo all\'invito due calici si toccano e partono i fuochi d\'artificio', 'fx.toast')}
+      <h4 class="fx-h" style="margin-top:26px">1. Atmosfera dell'apertura <small>sopra il video iniziale</small></h4>
       <div class="fx-par">${InvFx.MODES.map(x => `<button type="button" data-set="fx.particles" data-v="${x.id}" class="fxt ${p === x.id ? 'on' : ''}">
         <div class="fxt-pv" style="background-image:url('${theme.poster}')" data-atmos="${x.id}">${x.id === 'auto' ? `<span class="fxt-tag">${esc(auto?.name || '')}</span>` : ''}${p === x.id ? `<span class="chk">${I.check}</span>` : ''}</div>
         <b>${x.name}</b><small>${x.id === 'auto' ? `Per questo tema: ${esc((auto?.name || '').toLowerCase())}` : x.desc}</small></button>`).join('')}</div>
