@@ -372,7 +372,12 @@
         <div class="flow">${INV.flowers.map(f => `<button type="button" data-set="blocksStyle.flowers" data-v="${f.id}" class="${bs.flowers === f.id ? 'on' : ''}"><div style="${f.img ? `background-image:url('${f.img}')` : ''}">${f.img ? '' : '✕'}</div>${f.name}</button>`).join('')}</div></div></div>
       <div class="sec"><h3>Blocchi attivi</h3><p class="hint" style="margin:-6px 0 12px">Trascina per riordinare · Clicca per modificare · Occhio per nascondere</p>
         <div class="blocks" id="blocks">${list}</div>
-        <button type="button" class="rsvp-link" data-tab="rsvp"><img src="/media/icons/icon-feat-guests.png" alt=""><span><b>${esc(S.rsvp.title || 'Conferma la tua presenza')}</b><small>Sempre in fondo all'invito · si modifica nella scheda RSVP</small></span><em>Modifica →</em></button>
+        <div class="blk-i rsvp-i ${S.rsvp.enabled ? '' : 'hid'}">
+          <div class="blk-h" data-action="toggle-block" data-id="rsvp"><span class="grip lock" title="Il modulo di conferma resta sempre in fondo all'invito"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
+            <img src="/media/icons/icon-feat-guests.png" alt=""><b>Conferma la tua presenza<small>${esc(S.rsvp.title && S.rsvp.title !== 'Conferma la tua presenza' ? S.rsvp.title : 'sempre in fondo all\'invito')}</small></b>
+            <button type="button" class="ibtn" data-action="vis-rsvp" title="${S.rsvp.enabled ? 'Nascondi' : 'Mostra'}">${S.rsvp.enabled ? I.eye : I.eyeOff}</button></div>
+          ${openBlock === 'rsvp' ? `<div class="blk-b">${rsvpBody()}</div>` : ''}
+        </div>
         <div style="margin-top:14px"><button type="button" class="btn ${addOpen ? '' : 'pri'}" data-action="add-open">${I.plus} Aggiungi blocco</button></div>
         ${addOpen ? `<div class="add-grid">${Object.entries(INV.blockTypes).map(([k, t]) => `<button type="button" data-action="add-block" data-t="${k}"><img src="/media/icons/icon-blk-${t.icon}.png" alt="">${t.name}</button>`).join('')}</div>` : ''}</div>
       <div class="sec"><h3>Finale dell'invito</h3><p class="hint" style="margin:-6px 0 12px">Dopo l'ultimo blocco e la conferma di presenza: monogramma, nomi e data.</p>
@@ -510,7 +515,8 @@
   }
 
   // ---------- TAB: RSVP ----------
-  function tabRsvp() {
+  // contenuto del blocco "Conferma la tua presenza" (modulo RSVP), aperto dentro la scheda Blocchi
+  function rsvpBody() {
     const r = S.rsvp;
     const qs = (r.custom || []).map((q, i) => `<div class="rep"><div class="rep-h"><span>Domanda ${i + 1}</span><span>
         ${i > 0 ? `<button type="button" class="ibtn" data-action="mv-item" data-p="rsvp.custom" data-i="${i}" data-d="-1">↑</button>` : ''}
@@ -521,10 +527,8 @@
         <div class="pill-t">Obbligatoria ${sw(`rsvp.custom.${i}.required`, q.required)}</div></div>
       ${q.type === 'choice' ? `<label class="l">Opzioni</label>${(q.options || []).map((o, j) => `<div class="rowx" style="margin-bottom:6px"><span style="color:var(--mute)">○</span>${inp(`rsvp.custom.${i}.options.${j}`)}<button type="button" class="ibtn del" data-action="rm-item" data-p="rsvp.custom.${i}.options" data-i="${j}">${I.trash}</button></div>`).join('')}
         <button type="button" class="btn sm" data-action="add-item" data-p="rsvp.custom.${i}.options" data-tpl='""'>${I.plus} Opzione</button>` : ''}</div>`).join('');
-    return `<h2>Domande RSVP</h2><p class="lead">Scegli quali domande vedranno gli ospiti nel modulo di conferma.</p>
-      <div class="box"><div class="tog"><div class="ic">${I.users}</div><div class="tx"><b>Modulo RSVP attivo</b><small>Mostra il modulo di conferma in fondo all'invito</small></div>${sw('rsvp.enabled', r.enabled)}</div>
-        <label class="l">Titolo del modulo</label>${inp('rsvp.title')}
-        ${iconPicker('rsvp.icon', 'rsvp', S.rsvp.icon)}</div>
+    return `<label class="l" style="margin-top:0">Titolo del modulo</label>${inp('rsvp.title')}
+        ${iconPicker('rsvp.icon', 'rsvp', S.rsvp.icon)}
       <div class="box"><h3 class="serif" style="margin:0 0 4px;font-size:16px">Domande standard</h3>
         <div class="box soft" style="margin:10px 0 4px;font-size:12px"><b>Numero di ospiti</b><br><span style="color:var(--mute)">Si gestisce per ogni ospite nella scheda Ospiti: imposta "Posti" maggiore di 1 per permettere accompagnatori. Il modulo chiederà il numero solo a chi ne ha diritto.</span></div>
         ${tog('msg', 'Messaggio personale', 'Gli ospiti possono lasciarvi un messaggio', 'rsvp.message')}
@@ -605,7 +609,7 @@
 
   const TABS = [
     ['envelope', 'Busta', tabEnvelope], ['theme', 'Tema', tabTheme, I.theme], ['details', 'Dettagli', tabDetails], ['blocks', () => `Blocchi (${S.blocks.length})`, tabBlocks],
-    ['audio', 'Audio', tabAudio], ['languages', 'Lingue', tabLanguages, I.globe], ['rsvp', 'RSVP', tabRsvp, I.help],
+    ['audio', 'Audio', tabAudio], ['languages', 'Lingue', tabLanguages, I.globe],
     ['guests', () => `Ospiti${guestsData ? ` (${guestsData.guests.length})` : ''}`, tabGuests], ['url', 'Link personalizzato', tabUrl, I.link],
     ['album', 'Album foto', () => AlbumPanel.html(), I.camera],
     ['tools', 'Pianificazione', () => Planner.html(), I.tools],
@@ -657,7 +661,7 @@
   // ---------- trascinamento blocchi ----------
   function bindDrag() {
     let from = null;
-    panel.querySelectorAll('.blk-i').forEach(el => {
+    panel.querySelectorAll('.blk-i[data-bi]').forEach(el => {
       el.draggable = false;
       el.querySelector('.grip').addEventListener('mousedown', () => { el.draggable = true; });
       el.addEventListener('mouseup', () => { el.draggable = false; });
@@ -749,6 +753,7 @@
     switch (A) {
       case 'toggle-block': if (e.target.closest('.ibtn')) return; { const id = ac.dataset.id; openBlock = openBlock === id ? null : id; render(); if (openBlock) post({ view: openBlock }); } break;
       case 'vis-block': S.blocks[i].visible = !S.blocks[i].visible; changed(true); break;
+      case 'vis-rsvp': S.rsvp.enabled = !S.rsvp.enabled; changed(true); break;
       case 'del-block': if (confirm('Eliminare questo blocco?')) { S.blocks.splice(i, 1); changed(true); } break;
       case 'add-open': addOpen = !addOpen; render(); break;
       case 'add-block': { const t = ac.dataset.t; const b = { id: Math.random().toString(36).slice(2, 10), type: t, visible: true, accent: '', data: INV.blockTypes[t].def() };
