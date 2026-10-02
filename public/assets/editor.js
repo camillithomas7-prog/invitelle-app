@@ -55,7 +55,7 @@
   });
   const ID = window.__INVITE.id;
   let SLUG = window.__INVITE.slug;
-  let tab = 'theme', openBlock = null, addOpen = false, guestsData = null, gFilter = 'all', gSearch = '', editGuest = null, showCustomMsg = false;
+  let tab = 'envelope', openBlock = null, addOpen = false, guestsData = null, gFilter = 'all', gSearch = '', editGuest = null, showCustomMsg = false;
   const frame = $('#pv-frame');
   const panel = $('#panel');
 
@@ -599,7 +599,7 @@
   }
 
   const TABS = [
-    ['theme', 'Tema', tabTheme, I.theme], ['envelope', 'Busta', tabEnvelope], ['details', 'Dettagli', tabDetails], ['blocks', () => `Blocchi (${S.blocks.length})`, tabBlocks],
+    ['envelope', 'Busta', tabEnvelope], ['theme', 'Tema', tabTheme, I.theme], ['details', 'Dettagli', tabDetails], ['blocks', () => `Blocchi (${S.blocks.length})`, tabBlocks],
     ['audio', 'Audio', tabAudio], ['languages', 'Lingue', tabLanguages, I.globe], ['rsvp', 'RSVP', tabRsvp, I.help],
     ['guests', () => `Ospiti${guestsData ? ` (${guestsData.guests.length})` : ''}`, tabGuests], ['url', 'Link personalizzato', tabUrl, I.link],
     ['album', 'Album foto', () => AlbumPanel.html(), I.camera],
