@@ -11,7 +11,8 @@
     glicine: ['petali', ['#b9a2e0', '#d8c9f2', '#ffffff']], lavanda: ['petali', ['#9d7cc9', '#c7b2e6', '#e9defa']],
     parigi: ['petali', ['#d9667a', '#f2a7b4', '#fde4ea']], marrakech: ['petali', ['#c2304a', '#e46b7f', '#f7b7c2']],
     inverno: ['neve'], dolomiti: ['stelle'], bosco: ['lucciole'], puglia: ['foglie'], serra: ['lucciole'], venezia: ['lucciole'],
-    reggia: ['coriandoli'], toscana: ['oro'], como: ['oro'], santorini: ['petali', ['#ffffff', '#f3f6fb', '#dfe9f5']],
+    reggia: ['coriandoli'], toscana: ['oro'], como: ['oro'],
+    chiesa: ['oro'], sicilia: ['petali', ['#c2185b', '#e0457b', '#f7b0c8']], vigneto: ['lucciole'], giardino: ['petali', ['#ffffff', '#f4f0e8', '#e8eef5']], capri: ['oro'], boho: ['oro'], santorini: ['petali', ['#ffffff', '#f3f6fb', '#dfe9f5']],
   };
   const PETALS_DEF = ['#efbcc4', '#f6d6da', '#ffffff', '#e6a5ae'];
   const MODES = [

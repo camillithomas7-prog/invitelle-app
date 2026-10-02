@@ -2,11 +2,17 @@
 window.INV = {
   themes: [
     { id: 'amalfi', name: 'Terrazza di Amalfi', desc: 'Un arco fiorito sulla Costiera, al tramonto', video: '/media/themes/amalfi.mp4', poster: '/media/themes/amalfi.jpg', popular: true },
+    { id: 'chiesa', name: 'Navata in chiesa', desc: 'Petali bianchi lungo la navata e luce dalle vetrate', video: '/media/themes/chiesa.mp4', poster: '/media/themes/chiesa.jpg', popular: true },
+    { id: 'sicilia', name: 'Terrazza in Sicilia', desc: 'Barocco di Taormina, agrumi, il mare e l\'Etna', video: '/media/themes/sicilia.mp4', poster: '/media/themes/sicilia.jpg', popular: true },
     { id: 'como', name: 'Villa sul Lago', desc: 'Viale di cipressi verso una villa sul Lago di Como', video: '/media/themes/como.mp4', poster: '/media/themes/como.jpg', popular: false },
     { id: 'toscana', name: 'Castello in Toscana', desc: 'Vigneti e cipressi al tramonto in Val d\'Orcia', video: '/media/themes/toscana.mp4', poster: '/media/themes/toscana.jpg', popular: true },
+    { id: 'vigneto', name: 'Cena nel vigneto', desc: 'Tavolata tra i filari sotto le lucine, al tramonto', video: '/media/themes/vigneto.mp4', poster: '/media/themes/vigneto.jpg', popular: true },
+    { id: 'giardino', name: 'Giardino all\'italiana', desc: 'Siepi, fontana di marmo e ortensie bianche verso la villa', video: '/media/themes/giardino.mp4', poster: '/media/themes/giardino.jpg', popular: false },
     { id: 'glicine', name: 'Pergola di glicine', desc: 'Un giardino in fiore con rose bianche e fontana', video: '/media/themes/glicine.mp4', poster: '/media/themes/glicine.jpg', popular: false },
     { id: 'puglia', name: 'Masseria in Puglia', desc: 'Ulivi secolari e luminarie accese sotto le stelle', video: '/media/themes/puglia.mp4', poster: '/media/themes/puglia.jpg', popular: false },
     { id: 'mare', name: 'Altare sul mare', desc: 'Arco di rose bianche sulla spiaggia al tramonto', video: '/media/themes/mare.mp4', poster: '/media/themes/mare.jpg', popular: true },
+    { id: 'capri', name: 'Capri in barca', desc: 'Motoscafo d\'epoca nell\'acqua turchese dei Faraglioni', video: '/media/themes/capri.mp4', poster: '/media/themes/capri.jpg', popular: false },
+    { id: 'boho', name: 'Boho al tramonto', desc: 'Arco di pampas e fiori secchi nella luce dorata', video: '/media/themes/boho.mp4', poster: '/media/themes/boho.jpg', popular: false },
     { id: 'venezia', name: 'Palazzo a Venezia', desc: 'Il Canal Grande all\'ora blu, tra lanterne e gondole', video: '/media/themes/venezia.mp4', poster: '/media/themes/venezia.jpg', popular: false },
     { id: 'serra', name: 'Serra di cristallo', desc: 'Centinaia di candele e ortensie in una serra di vetro', video: '/media/themes/serra.mp4', poster: '/media/themes/serra.jpg', popular: false },
     { id: 'dolomiti', name: 'Chalet nelle Dolomiti', desc: 'Prato fiorito e vette rosate al tramonto', video: '/media/themes/dolomiti.mp4', poster: '/media/themes/dolomiti.jpg', popular: false },
