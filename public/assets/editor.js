@@ -372,6 +372,7 @@
       return `<div class="blk-i ${b.visible ? '' : 'hid'}" draggable="true" data-bi="${i}">
         <div class="blk-h" data-action="toggle-block" data-id="${b.id}"><span class="grip" title="Trascina per riordinare">${I.grip}</span>
           <img src="/media/icons/icon-blk-${bt.icon}.png" alt=""><b>${bt.name}${blockTitle(b)}</b>
+          <span class="mv-btns"><button type="button" class="ibtn" data-action="mv-block" data-i="${i}" data-d="-1" ${i ? '' : 'disabled'} aria-label="Sposta su"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 15l6-6 6 6"/></svg></button><button type="button" class="ibtn" data-action="mv-block" data-i="${i}" data-d="1" ${i < S.blocks.length - 1 ? '' : 'disabled'} aria-label="Sposta giù"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></button></span>
           <button type="button" class="ibtn" data-action="vis-block" data-i="${i}" title="${b.visible ? 'Nascondi' : 'Mostra'}">${b.visible ? I.eye : I.eyeOff}</button>
           <button type="button" class="ibtn del" data-action="del-block" data-i="${i}" title="Elimina">${I.trash}</button></div>
         ${open ? `<div class="blk-b">${(F[b.type] || []).map(f => field(`blocks.${i}.data`, f)).join('')}
@@ -387,7 +388,7 @@
         <label class="l">Colore del testo <span style="font-weight:400;color:var(--mute)">(per i blocchi)</span></label>${colorRow('blocksStyle.color')}
         <label class="l">Colore delle icone <span style="font-weight:400;color:var(--mute)">(icone a linea)</span></label>${colorRow('blocksStyle.iconColor')}
         <div class="rowx" style="margin-top:10px;gap:8px;flex-wrap:wrap"><span class="hint" style="margin:0">Stessa icona per tutti i blocchi:</span>${[0, 1, 2, 3, 4, 5].map(v => `<button type="button" class="btn sm" data-action="icons-all" data-v="${v}">${v ? 'Linea ' + v : 'Classica 3D'}</button>`).join('')}</div></div>
-      <div class="sec"><h3>Blocchi attivi</h3><p class="hint" style="margin:-6px 0 12px">Trascina per riordinare · Clicca per modificare · Occhio per nascondere</p>
+      <div class="sec sec-blocks"><h3>Blocchi attivi</h3><p class="hint" style="margin:-6px 0 12px">Trascina per riordinare · Clicca per modificare · Occhio per nascondere</p>
         <div class="blocks" id="blocks">${list}</div>
         <div class="blk-i rsvp-i ${S.rsvp.enabled ? '' : 'hid'}">
           <div class="blk-h" data-action="toggle-block" data-id="rsvp"><span class="grip lock" title="Il modulo di conferma resta sempre in fondo all'invito"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
@@ -641,6 +642,9 @@
     const y = window.scrollY;
     const fx = document.activeElement?.dataset?.k;
     panel.innerHTML = TABS.find(t => t[0] === tab)[2]();
+    panel.dataset.tab = tab;
+    // sul telefono la scheda attiva resta visibile nel menu scorrevole
+    $('#tabs .on')?.scrollIntoView({ block: 'nearest', inline: 'center' });
     window.scrollTo(0, y);
     if (fx) { const el = panel.querySelector(`[data-k="${CSS.escape(fx)}"]`); if (el && el.type !== 'checkbox') { el.focus(); if (el.setSelectionRange && el.type === 'text') el.setSelectionRange(el.value.length, el.value.length); } }
     bindDrag();
@@ -787,6 +791,7 @@
     switch (A) {
       case 'toggle-block': if (e.target.closest('.ibtn')) return; { const id = ac.dataset.id; openBlock = openBlock === id ? null : id; render(); if (openBlock) post({ view: openBlock }); } break;
       case 'vis-block': S.blocks[i].visible = !S.blocks[i].visible; changed(true); break;
+      case 'mv-block': { const j = i + +ac.dataset.d; if (j < 0 || j >= S.blocks.length) break; const [m] = S.blocks.splice(i, 1); S.blocks.splice(j, 0, m); changed(true); post({ view: m.id }); } break;
       case 'vis-rsvp': S.rsvp.enabled = !S.rsvp.enabled; changed(true); break;
       case 'del-block': if (confirm('Eliminare questo blocco?')) { S.blocks.splice(i, 1); changed(true); } break;
       case 'add-open': addOpen = !addOpen; render(); break;
