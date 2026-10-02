@@ -273,3 +273,18 @@
 .intro.light-txt[data-read="card"] .txt::before { background: rgba(25,18,14,.38); }
 .intro[data-read="strong"].dark-txt .hl, .intro[data-read="strong"].dark-txt .date { text-shadow: 0 0 18px rgba(255,255,255,.9), 0 1px 2px rgba(255,255,255,.8); }
 .intro[data-read="strong"].light-txt .hl, .intro[data-read="strong"].light-txt .date { text-shadow: 0 0 18px rgba(0,0,0,.65), 0 1px 3px rgba(0,0,0,.6); }
+
+/* ---------- BORDI LUNGO TUTTO L'INVITO (cornice continua) ---------- */
+.paper > .rail { display: none; position: absolute; top: 0; bottom: 0; width: min(13%, 66px); z-index: 0; pointer-events: none;
+  background: var(--flwt) center top / 100% auto repeat-y;
+  -webkit-mask-image: linear-gradient(transparent, #000 140px, #000 calc(100% - 160px), transparent); mask-image: linear-gradient(transparent, #000 140px, #000 calc(100% - 160px), transparent); }
+.rail-l { left: 0; } .rail-r { right: 0; transform: scaleX(-1); background-position: center 37%; }
+.borders-full .paper > .rail { display: block; }
+.borders-full .blk .fl { display: none !important; }
+/* tutti i contenuti stanno dentro la cornice */
+.borders-full .blk:not(.photo) { padding-left: calc(min(13%, 66px) + 10px); padding-right: calc(min(13%, 66px) + 10px); }
+.borders-full .blk:not(.photo) > :is(h2, .sub, p, .caps, .swatches, .iban, .day-tabs) { margin-left: 0; margin-right: 0; }
+.borders-full .blk.photo { margin-left: calc(min(13%, 66px) - 6px); margin-right: calc(min(13%, 66px) - 6px); border-radius: 14px; }
+.borders-full .finale, .borders-full .foot { padding-left: calc(min(13%, 66px) + 10px); padding-right: calc(min(13%, 66px) + 10px); }
+.borders-full .car { margin-left: -6px; margin-right: -6px; }
+.borders-full .orn svg { width: 160px; }

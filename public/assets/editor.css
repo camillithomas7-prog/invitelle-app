@@ -557,3 +557,16 @@ body.wide .pl-table, body.wide .ck-g, body.wide .pl-prog { max-width: 1100px; }
 .tp-box small { display: block; font-size: 7px; letter-spacing: .12em; margin-top: 2px; }
 .txtpos.dragging .tp-box { border-color: var(--brand); background: rgba(255,255,255,.4); }
 @media (max-width: 560px) { .txtpos-wrap { grid-template-columns: 120px 1fr; } }
+
+/* come disporre i bordi: due anteprime */
+.bmode { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.bmode button { text-align: left; padding: 8px 8px 10px; border: 1px solid var(--line2); border-radius: 14px; background: #fff; display: flex; flex-direction: column; gap: 2px; }
+.bmode button.on { border-color: var(--brand); box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 22%, transparent); }
+.bmode b { font-size: 13.5px; font-weight: 600; margin: 8px 4px 0; } .bmode small { font-size: 11.5px; color: var(--mute); margin: 0 4px; line-height: 1.35; }
+.bm-pv { position: relative; height: 150px; border-radius: 10px; background: #fbf8f2; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 14px; }
+.bm-pv span { display: block; width: 46%; height: 26px; border-radius: 5px; background: rgba(60,40,30,.08); position: relative; z-index: 1; }
+.bm-fl { position: absolute; top: 4px; width: 22px; height: 62px; background: left top / 100% auto no-repeat; -webkit-mask-image: linear-gradient(#000 60%, transparent); mask-image: linear-gradient(#000 60%, transparent); }
+.bm-fl.b2 { top: 78px; } .bm-fl.l { left: 2px; } .bm-fl.r { right: 2px; transform: scaleX(-1); }
+.bm-rail { position: absolute; top: 0; bottom: 0; width: 20px; background: center top / 100% auto repeat-y; }
+.bm-rail.l { left: 2px; } .bm-rail.r { right: 2px; transform: scaleX(-1); }
+@media (max-width: 560px) { .bmode small { display: none; } }

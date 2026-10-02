@@ -293,16 +293,23 @@
     const fl = INV.flowers.find(f => f.id === bs.flowers);
     root.classList.toggle('has-flowers', !!fl?.img);
     root.style.setProperty('--flw', fl?.img ? `url('${fl.img}')` : 'none');
+    // bordi: accanto a ogni blocco (blocks) oppure cornice continua lungo tutto l'invito (full)
+    const full = !!fl?.img && bs.flowersMode === 'full';
+    root.classList.toggle('borders-full', full);
+    root.style.setProperty('--flwt', full ? `url('${fl.img.replace('.webp', '-tile.webp')}')` : 'none');
     const vis = S.blocks.filter(b => b.visible && blockRender[b.type]);
     const parts = vis.map(blockHTML);
     if (S.rsvp.enabled) { parts.push(rsvpHTML()); vis.push({ type: 'rsvp', data: {} }); }
     const isPhoto = b => b && b.type === 'countdown' && b.data.image;
     // ornamento tra un blocco e l'altro (non accanto alle foto a tutta larghezza)
-    const keepFx = paper.querySelector(':scope > .atmos-body');   // l'atmosfera dei blocchi non riparte a ogni modifica
+    const keepFx = paper.querySelector(':scope > .atmos-body');
+    const keepRails = [...paper.querySelectorAll(':scope > .rail')];   // l'atmosfera dei blocchi non riparte a ogni modifica
     paper.innerHTML = parts.map((h, i) => (i && !isPhoto(vis[i]) && !isPhoto(vis[i - 1]) ? ORN : '') + h).join('')
       + (fxMotion() === 'none' && !S.details.date ? '' : finaleHTML())
       + `<div class="foot">${T('madeWith')}</div>`;
     if (keepFx) paper.prepend(keepFx);
+    if (keepRails.length) paper.prepend(...keepRails);
+    else paper.insertAdjacentHTML('afterbegin', '<i class="rail rail-l" aria-hidden="true"></i><i class="rail rail-r" aria-hidden="true"></i>');
     paper.querySelectorAll('.blk').forEach(b => [...b.children].filter(c => !c.classList.contains('fl') && !c.classList.contains('ph-bg')).forEach((c, k) => c.style.setProperty('--i', k)));
     bindRsvp(root);
     bindCarousels(root);

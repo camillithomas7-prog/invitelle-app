@@ -154,7 +154,11 @@
     const cur = S.blocksStyle.flowers;
     return `<div class="sec" style="margin-top:26px"><h3>Bordi floreali</h3>
       <p class="hint" style="margin:-6px 0 12px">Decorazioni ai lati dei blocchi, mentre gli ospiti scorrono l'invito.</p>
-      <div class="flow">${INV.flowers.map(f => `<button type="button" data-set="blocksStyle.flowers" data-v="${f.id}" class="${cur === f.id ? 'on' : ''}"><div style="${f.img ? `background-image:url('${f.img}')` : ''}">${f.img ? '' : '✕'}</div>${f.name}</button>`).join('')}</div></div>`;
+      <div class="flow">${INV.flowers.map(f => `<button type="button" data-set="blocksStyle.flowers" data-v="${f.id}" class="${cur === f.id ? 'on' : ''}"><div style="${f.img ? `background-image:url('${f.img}')` : ''}">${f.img ? '' : '✕'}</div>${f.name}</button>`).join('')}</div>
+      ${cur && cur !== 'none' ? `<label class="l" style="margin-top:16px">Come disporli</label>
+      <div class="bmode">${[['blocks', 'Accanto a ogni blocco', 'Un mazzetto ai lati di ogni sezione, arioso'], ['full', 'Lungo tutto l\'invito', 'Una cornice continua di fiori che scende ai lati di tutta la pagina']].map(([v, t, d]) => `<button type="button" data-set="blocksStyle.flowersMode" data-v="${v}" class="${(S.blocksStyle.flowersMode || 'blocks') === v ? 'on' : ''}">
+        <div class="bm-pv bm-${v}">${v === 'full' ? `<i class="bm-rail l" style="background-image:url('${(INV.flowers.find(f => f.id === cur) || {}).img}')"></i><i class="bm-rail r" style="background-image:url('${(INV.flowers.find(f => f.id === cur) || {}).img}')"></i>` : `<i class="bm-fl l" style="background-image:url('${(INV.flowers.find(f => f.id === cur) || {}).img}')"></i><i class="bm-fl r" style="background-image:url('${(INV.flowers.find(f => f.id === cur) || {}).img}')"></i><i class="bm-fl l b2" style="background-image:url('${(INV.flowers.find(f => f.id === cur) || {}).img}')"></i><i class="bm-fl r b2" style="background-image:url('${(INV.flowers.find(f => f.id === cur) || {}).img}')"></i>`}<span></span><span></span><span></span></div>
+        <b>${t}</b><small>${d}</small></button>`).join('')}</div>` : ''}</div>`;
   }
   // effetti dell'invito: animazioni e atmosfera sopra il video iniziale, con anteprime animate dal vivo
   function fxSec() {
@@ -775,7 +779,7 @@
       set(st.dataset.set, st.dataset.v); changed(true);
       if (st.dataset.set.startsWith('envelope')) post({ data: S, view: 'envelope' });
       if (st.dataset.set === 'theme' || st.dataset.set.startsWith('fx.')) post({ replay: true });
-      if (st.dataset.set === 'blocksStyle.flowers') { const b = S.blocks.find(x => x.visible && !(x.type === 'countdown' && x.data.image)); if (b) post({ view: b.id }); }
+      if (st.dataset.set === 'blocksStyle.flowers' || st.dataset.set === 'blocksStyle.flowersMode') { const b = S.blocks.find(x => x.visible && !(x.type === 'countdown' && x.data.image)); if (b) post({ view: b.id }); }
       return;
     }
     const ac = e.target.closest('[data-action]'); if (!ac) return;
